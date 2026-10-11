@@ -136,7 +136,7 @@
   </header>
 
   <main class="planet">
-    <p class="generated">Generated <span class="generated-at">2026-10-10T18:49:02+00:00</span> ·
+    <p class="generated">Generated <span class="generated-at">2026-10-11T09:16:24+00:00</span> ·
       <a class="feed-link" href="https://rkdarst.github.io/nordic-rse-planet/atom.xml">Atom feed</a> ·
       This page and feed are sanitized for security, formatting may be wrong.</p>
     
@@ -1978,98 +1978,6 @@ ideas onto the website (before anyone even sees the site) and refine
 them, aggressively narrowing down.  To avoid wasted work, it’s
 “first-draft” or “notes” level work at the beginning if we aren’t sure
 about it.</p>
-
-</div>
-      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
-      
-    </article>
-    
-    <article class="post">
-      <div class="post-header"><a class="post-icon-link" href="https://rkd.zgib.net">
-        <img class="post-icon" src="images-cached/6a0855db9256ea61.jpg" alt="Richard Darst"></a>
-        <div>
-          <h1 class="post-title"><a class="post-link" href="https://rkd.zgib.net/blog/2026/debian-with-unionfs-root/">Debian with unionfs root</a></h1>
-          <div class="post-meta">
-            <span class="feed-title"><a href="https://rkd.zgib.net">Richard Darst</a></span>
-            <span class="post-date">2026-07-13 00:00 UTC</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="summary">
-
-<p>I wanted to make a virtual machine that has a root that is immutable -
-when booted, it would have a tmpfs for all files, and then when
-reboots, everything goes back to normal.  I set this up before the
-<a href="https://rkd.zgib.net/blog/2026/debian-with-unionfs-root/2026/debian-read-only-root/"><span>read-only root filesystem</span></a>,
-but the use case is slightly different here.  I want a way to test
-things on the internet, without going through my home network, more
-lightweight than making/snapshotting and deleting a VM every time.  It
-might also be useful when you want a system that is mostly normal but
-home directories are in memory.</p>
-<p>This post is mostly internal notes but may be helpful to others.</p>
-
-
-<h2>The idea</h2>
-<p>I make a VM and give it an overlayfs for <code><span>/home</span></code>.  This has the base
-(the real <code><span>/home</span></code> and the upper directory <code><span>/tmp/home</span></code> where any
-modifications are stored.  <code><span>/tmp</span></code> is an automatic tmpfs, and then
-there is no permanent changes made to one’s home directory.</p>
-<p>First, install the VM and I have found it is good to <code><span>touch</span>
-<span>~/.Xauthority</span></code> before doing the overlay, so that <code><span>ssh</span> <span>-X</span></code> works.</p>
-
-
-
-<h2>Filesystem mounts</h2>
-<p>This is implemented via an overlayfs.</p>
-<p>On the Debian version I have, <code><span>/tmp</span></code> is already a <code><span>tmpfs</span></code>.  If
-not, you should set up that first.</p>
-<p>I add the following into <code><span>/etc/fstab</span></code>.  It seems to automatically
-make the directories within /tmp, which of course are never saved
-since it is a tmpfs.:</p>
-<div><div><pre><span></span><span>homeoverlay</span>   <span>/</span><span>home</span><span>/</span>          <span>overlay</span>  <span>auto</span><span>,</span><span>nofail</span><span>,</span><span>unbindable</span><span>,</span><span>lowerdir</span><span>=/</span><span>home</span><span>/</span><span>,</span><span>upperdir</span><span>=/</span><span>tmp</span><span>/</span><span>home</span><span>/</span><span>,</span><span>workdir</span><span>=/</span><span>tmp</span><span>/</span><span>home</span><span>-</span><span>work</span> <span>0</span> <span>0</span>
-</pre></div>
-</div>
-<p>The following line makes a bind-mount of root which I hoped to use to
-access the underlay of <code><span>/home</span></code> without having to reboot, but this
-line did <em>not</em> work that way (the binds were passed through, even
-though it is <code><span>bind</span></code> and not <code><span>rbind</span></code> which should be recursive).
-Any other bind-mounts I tried to do did not work as expected:</p>
-<div><div><pre><span></span><span>/</span>             <span>/</span><span>mnt</span><span>/</span><span>root</span><span>-</span><span>bind</span><span>/</span> <span>none</span>     <span>defaults</span><span>,</span><span>bind</span> <span>0</span> <span>0</span>
-</pre></div>
-</div>
-<p>To bind-mount (via qemu or whatever it was) from outside, I have this
-fstab line:</p>
-<div><div><pre><span></span><span>/</span><span>new</span>          <span>/</span><span>new</span><span>/</span>           <span>virtiofs</span> <span>defaults</span><span>,</span><span>auto</span> <span>0</span> <span>0</span>
-</pre></div>
-</div>
-
-
-
-<h2>Network bridge to VPN</h2>
-<p>The network is bridged to a separate vlan to further isolate it (this
-vlan is managed by my home router outside the host, so there is no way
-this system could possibly send traffic without the vpn).  In
-virt-manager, I set it to a bridge device I have configured on the
-host to be bridged to the VPN.  I’m recording this here since it’s
-relevant.</p>
-<p>First, you need to make a bridge device.  I add the following to
-<code><span>/etc/network/interfaces</span></code>.  I don’t make this automatically
-activate, since on the host I don’t want long-term effects unless I do
-something.  The VM fails to start if it isn’t activated:</p>
-<div><div><pre><span></span><span>iface</span> <span>br</span><span>-</span><span>vpn2</span> <span>inet</span> <span>dhcp</span>
-  <span>bridge_ports</span> <span>enp4s0</span><span>.22</span>
-  <span>metric</span> <span>300</span>
-</pre></div>
-</div>
-<p>Activate the bridge with <code><span>ifup</span> <span>br-vpn22</span></code>.</p>
-<p>Modern Linux send bridge traffic through netfiter (iptables).  You can
-either allow it in the <code><span>FORWARD</span></code> chain if it’s not set by default,
-or for my case it was easiest to make it not use netfilter:</p>
-<div><div><pre><span></span><span># </span><span>echo</span><span> </span><span>"0"</span><span> </span><span>|</span><span> </span>sudo<span> </span>tee<span> </span>/proc/sys/net/bridge/bridge-nf-call-iptables
-</pre></div>
-</div>
-<p>If you don’t do the above, remember to <code><span>sysctl</span> <span>net.ipv4.ip_forward=1</span></code>.</p>
 
 </div>
       <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
