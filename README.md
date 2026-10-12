@@ -27,6 +27,8 @@ The "community" includes at least Nordic-RSE and CodeRefinery.
 
 ## Content policy
 
+Posts don't have to be perfect, and can start a conversation.
+
 You are allowed and encouraged to post about things not related to
 work, including your own hacking, learning, opinions, and hobbies.
 (Work stuff is also allowed and encouraged, obviously).  The purpose
