@@ -3,11 +3,19 @@
 # General site settings
 site:
   title: "Nordic-RSE blog planet"
-  site_url: "https://rkdarst.github.io/nordic-rse-planet/"
-  atom_feed_url: "https://rkdarst.github.io/nordic-rse-planet/atom.xml"
+  site_url: "https://nordic-rse.org/planet/"
+  atom_feed_url: "https://nordic-rse.org/planet/atom.xml"
+  # Optional stable feed id; defaults to atom_feed_url.
+  # Set it if you want the id to survive the feed URL moving.
   feed_guid: "urn:uuid:7fd32cd4-fd62-48f3-9052-920208210fb4"
-  #   Optional stable feed id; defaults to atom_feed_url.
-  #   Set it if you want the id to survive the feed URL moving.
+  intro: |
+    The Nordic-RSE planet is a "blog aggregator": various blogs are
+    combined into one web view that keeps the community together.  The
+    term comes from the pre-big-tech era, but is useful again today.
+    You can follow the combined feed using a feed reader (do a web
+    search).  See the [github
+    repo](https://github.com/nordic-rse/planet/) for how to add
+    yourself.
 
 # Output file paths
 output:
