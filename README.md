@@ -1,4 +1,4 @@
-# Proposed Nordic-RSE planet
+# Nordic-RSE planet (blog aggregator)
 
 This is a static-site based, Github-pages deployable "planet" - an
 old-style aggregator and viewer of RSS feeds.  It provides a way for
@@ -11,21 +11,18 @@ You can see an example planet at https://planet.debian.org/
 
 The code behind this is https://github.com/rkdarst/pyplanet2
 
-## Everything below is my proposal, please suggest changes
-
-I am making this for Nordic-RSE.  If accepted this readme will be
-updated.  I propose that this be put somewhere like
-planet.nordic-rse.org (or planet.coderefinery.org if we want to make
-it broader) and we add feeds from, for example:
+**Items below are proposals as of October 2026 - to be updated.**
 
 ## What can be included
 
-* Blogs of individuals within the community (loosely defined)
+The "community" includes at least Nordic-RSE and CodeRefinery.
+
+* Blogs of individuals within the community (loosely defined).
 * Blogs of organizations within the community (a bit more strictly
-  defined)
-* Possibly news feeds of organizations within the community, but a
+  defined).
+* Possibly news feeds of organizations within the community (with a
   preference to human-written blog format things, rather than basic
-  news stories and press releases.  These can be added but removed if
+  news stories and press releases).  These can be added but removed if
   they begin dominating too much or are not blog-like enough.
 
 ## Content policy
@@ -41,25 +38,33 @@ Content should be by humans and for humans.  Using content generators
 is not explicitly forbidden, but they should not reduce the amount of
 work you need to do to create and develop an idea (so at least
 proofreading, translation, and so on is OK).  Content shouldn't be
-misinformaiton, clickbait, sensationalist, hateful, and so on
-(it should follow the Code of Conduct).
+misinformaiton, clickbait, sensationalist, hateful, and so on (it
+should follow the [Code of
+Conduct](https://nordic-rse.org/about/code-of-conduct/)).
 
-It's recommend to use good writing styles so that someone reading only
-the first paragraphs can get a good overview of what the post is
-about.  This allows people to quickly scan the planet for posts
-interesting to them.
+There's too much information in the world, so I (rkdarst) would
+recommend to try good writing styles that put the most important
+summaries at the start of each post, so that someone reading only the
+first paragraphs can get a good overview of what the post is about.
+This allows people to quickly scan the planet for posts interesting to
+them.
 
-The HTML view has images cached.  Feeds, sites, and posts linked
-should not have dark patterns with respect to privacy or web security.
+The HTML view has images cached and content is sanitized.  Feeds,
+sites, and posts linked should not have dark patterns with respect to
+privacy or web security.
+
 
 ## Adding feeds
 
-Feeds are added via editing the config.yaml file, which should be
-self-explanatory.
+Feeds are added via editing the nordic-rse.yaml file, which should be
+self-explanatory.  Full-text feeds are preferred, so people can
+quickly scan the whole post in the planet.
 
-Possible issues:
+If a feed doesn't render properly, ask rkdarst.  The planet software
+is still being developed.
 
-* I've noticed some feeds have different semantics for how image links
-  are resolved, so the `resolve_urls` setting may need adjusting.  Let
-  rkdarst know if you see this (until it is known enough to be fully
-  documented).
+
+## Management
+
+The Nordic-RSE biweekly meeting watches over this.  rkdarst looks over
+the implementation.
