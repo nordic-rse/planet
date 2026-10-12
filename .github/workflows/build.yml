@@ -1,7 +1,7 @@
 name: Build planet
 on:
   push:
-    branches: [master]        # deploy only from the default branch
+    branches: [main]        # deploy only from the default branch
   schedule:
     - cron: "37 5,17 * * *"   # min, hr, dom, mo, dow
       timezone: "Europe/Helsinki"
