@@ -9,7 +9,7 @@ site:
   # Set it if you want the id to survive the feed URL moving.
   feed_guid: "urn:uuid:7fd32cd4-fd62-48f3-9052-920208210fb4"
   intro: |
-    The Nordic-RSE planet is a "blog aggregator": various blogs are
+    The [Nordic-RSE](https://nordic-rse.org) planet is a "blog aggregator": various blogs are
     combined into one web view that keeps the community together.  The
     term comes from the pre-big-tech era, but is useful again today.
     You can follow the combined feed using a feed reader (do a web
