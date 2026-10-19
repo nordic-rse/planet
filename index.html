@@ -167,7 +167,7 @@ search).  See the <a href="https://github.com/nordic-rse/planet/">github
 repo</a> for more info and how
 to add yourself.</p></div>
     
-    <p class="generated">Generated <span class="generated-at">2026-10-19T08:03:46+00:00</span> ·
+    <p class="generated">Generated <span class="generated-at">2026-10-19T20:09:17+00:00</span> ·
       This page and feed are sanitized for security, formatting may be wrong.</p>
     
     <aside class="feeds-sidebar">
@@ -199,6 +199,81 @@ to add yourself.</p></div>
     
     <div class="post-flow">
 
+    
+    <article class="post">
+      <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
+        <div class="post-icon icon-placeholder"></div></a>
+        <div>
+          <h1 class="post-title"><a class="post-link" href="https://digitalflapjack.com/weeknotes/2026-10-19/">Weeknotes: 19th October 2026</a></h1>
+          <div class="post-meta">
+            <span class="feed-title"><a href="https://digitalflapjack.com">Michael Dales</a></span>
+            <span class="post-date">2026-10-19 10:00 UTC</span>
+          </div>
+          <p class="content-note">Some embedded content from this post is not shown here (input) - consider seeing the original post.</p>
+        </div>
+      </div>
+      
+      <div class="summary"><h1>Pondering test data selection</h1>
+<p><a href="https://digitalflapjack.com/weeknotes/2026-10-12/">Last week</a> I talked about two strands of work on the habitat map work: improving the robustness of my validation approach, and integrating <a href="https://ebird.org/home">eBird</a> into my occurrence data alongside that from <a href="https://GBIF.org">GBIF</a>. I spent some time wrapping up those bits, and am now quite pleased with where we are.</p>
+<p>One interesting thing that fell out of all this was there's a subtle but interesting decision point as to when in a pipeline to split out your test data from your training data. Looking back at what I was doing previously and comparing that with other published work that validates itself in a similar way, I suspect that I'm not alone in this error because it's a slightly easy trap to fall into. Let me explain.</p>
+<p>In this pipeline, like many other pipelines, I'm taking some samples from the real world, cleaning them up to try to remove problems with the real world source data, and then applying that to a statistical model (in this case, it's a machine learning model, but that's still just a very fancy statistical model in my book). At some point in pipeline you want to take some of your input data and use that for validation, and the question is when do you do that? You could take it right at the start, so you're not biasing the results by being selective, or you could take it somewhere later once you've done some quality checks on the data to remove obvious outliers - we work with species occurrence data on this project, and not every occurrence record is correct, as it can be hard to tell what species you're looking at sometimes, or your GPS record could be wrong, etc. If you're testing your results against existing work, then doing this will improve the scores for both works, so this seems fine.</p>
+<p>However, at some point, your improvements are non-standard (I'm talking about this in a research context, not an engineering context, so at some point your new method comes into play), and even though you think you're doing good to clean up the data, it's really your own method you're testing at this point, and so you're starting to bias the sample data in your favour. For example, as I described last week, I use <a href="https://openstreetmap.org">OpenStreetMap</a> to help clear up occurrence data, and the numbers show that doing this improves the validation score for both my habitat map and for the two other maps I'm comparing against, but it improves my scores a lot more than the others, so whilst I think I've done the right thing here, I feel I should choose before I do any custom filtering. But perhaps that means the other maps were trained on bad data, so I should be doing this filtering? It's all a bit murky.</p>
+<p>I think the main guiding principle here is to be transparent about how one is doing it. Reading the other papers I suspect they've not considered this as much - which is fine, as they weren't trying to contrast their work with others, being pioneers in the space, but it is something I think I need to be cognisant of. For now, I think the most defensible thing I can do is draw the line after doing existing published occurrence cleaning techniques from other papers, such as <a href="https://royalsocietypublishing.org/rstb/article/366/1578/2623/21632/What-spatial-data-do-we-need-to-develop-global">Boitani et al 2011</a> (not that I believe that to be a gold standard, but it is an agreed upon standard), and then my own cleaning I will defer after the training split, or if I do chose to do more filtering I should publish the impact in addition to the cleaning that is agreed upon by others.</p>
+<p>Ultimately, why are we validating? It's not that I want to be best so I can win a race, it's because I want to try and improve the state of the art, and comparative validation is the only way I can track if I'm helping the world of ecology or not. I do believe our approach has promise, but I need to try and convince myself that what I'm going to share with people is better as much as I need to demonstrate it to others. It's easy to pick numbers that paint us in a fair light, but the point here is to try do something to help save the planet, and so I want the assessment to be properly critical of my work so that others can build upon it in confidence.</p>
+<h1>Urban spread</h1>
+<p>As noted last week, adding the eBird data wasn't the automatic win I had naively assumed it would be. In Madagascar whilst there are four times as many occurrences in the eBird data as there are in GBIF, it actually doesn't improve our area coverage significantly: most of the samples are taken at places already covered by other datasets. However, that wasn't true for my other test region, the Brazilian state of Minas Gerais: eBird data did actually expand area coverage by a meaningful amount, and so I generated an updated habitat map for that region.</p>
+<p></p><div><div><div>
+<img src="images-cached/98f1f67dfc7eb813.png"></div></div></div><p></p>
+<p>The map is looking a lot better than it did the last time I generated one, but is still quite flawed, for many reasons. Some of those I hope will be tackled as we go from regional maps to global maps, but there is one common issue that I see in all my maps, regardless of whether they're data-rich or data-deprived (it just is worse in data-deprived regions), which is the maps falsely showing urban habitats where we don't expect to find them. You can see this in the dark pink pixels in the western bit that sticks out to the side (Triângulo Mineiro), but it's also a problem in the UK where we have plenty of data, so what's going on?</p>
+<p>The root cause here is that we have two real problems, which are then compounded by a third:</p>
+<ol>
+<li>Most occurrence data for species, particularly in data-deprived areas, is taken in &quot;urban&quot; environments.</li>
+<li>In the <a href="https://www.iucnredlist.org/resources/habitat-classification-scheme">IUCN habitat classification system v3.1</a> there is just one habitat class for urban (14.5).</li>
+</ol>
+<p>Urban unfortunately isn't one type of habitat really: it covers buildings, and parks, and gardens, and roads; it covers high density city centres and low density villages. So we end up in a situation where most of our data isn't from natural habitats, and worse it is from the non-natural similar looking bits of so called urban environments. This means even in the data-rich UK I see urban polluting areas where it shouldn't in my habitat map: tops of mountains are rocky reflective areas, which look a bit like buildings so get classified as urban; rocks on the shore lines, perhaps are a little bit like roads, come out as urban; hedges between fields in farmland, well most hedges in my sample are in gardens so yes, urban again; grassy pasture that's been well cropped, looks a bit like a park, must be urban.</p>
+<p>Just to give you an example, here's some UK farmland from a version of my map before I started to try correct for this:</p>
+<div><div><img src="images-cached/9319b4f1d9ebcbc9.png" alt="Predicted"><img src="images-cached/bdd97f49c93a552d.png" alt="Satellite"><div></div><span>Predicted</span><span>Satellite</span></div></div>
+<p>The dark pink is where we predict arable farmland, light pink is where we predict urban, the light green is predicted grassland, and the dark green forest. In the UK 42% of my occurrences are urban, 20% forest, 7.5% arable, and 7.5% grassland. Given the bias in the data it's not a surprise that we end up thinking everything is its artificial variant. In Minas Gerais 38% of labels are urban also, sitting just ahead of moist lowland forest at 35%, but then we have a big gap to degraded former forest at 12%.</p>
+<p>So now we come to the third problem: biases in data like this are nothing new, and there are methods to deal with this, just I'm not using them as I'm pretty new to this machine learning/statistical modelling world. Thankfully I have smart colleagues I can turn to for assistance! I had discussions with both <a href="https://toao.com">Sadiq Jaffer</a> and <a href="https://www.aneeshnaik.com">Aneesh Naik</a>, and they pointed out that the classifier I've been using for my map inference stage isn't up to snuff, and that I need to up my game.</p>
+<p>Until now I've just been following the Tessera 101 example <a href="https://anil.recoil.org">Anil Madhavapeddy</a> put together for me a while ago. Being a simple tutorial it just used a simple classifier for the map inference stage, a k-nearest neighbours strategy, which for each pixel you're trying to guess, finds the labelled pixels with the nearest value to your guessing pixel in the Tessera embedding space, pick the top k (say k=5, you take the top 5) labelled pixels that are closest, and take the most common label. I like this, because as a machine learning newbie it's easy to understand, but it's also easy to see that if you have a biased dataset where say most hedges are labelled in urban gardens, then when we see hedges in fields we'll end up saying it's urban.</p>
+<p>To solve this there are better classifiers, such as linear classifiers, and then balanced classifiers within those, that try to do a better job of not letting a single group of labels win just based on weight of numbers. Thus I've spent a day skilling up on linear classifiers. I have just about got my head around them, and initial results certainly show this is helping, but before I got too far with that I hit another issue...</p>
+<h1>There probably aren't mangrove forests in Scotland (yet)</h1>
+<p>Whilst using a linear classifier did look good, trying to use a balanced linear classifier made some really bad maps, and so I needed to look into why. In theory a balanced classifier tries to weight the different classes based on how many samples they have, so the fact we have more variety in urban pixels isn't as influential as the fewer pixels we have for say rocky areas. My usual test case for this is Skye, where the Black Cuillin mountain tops come out as urban with Tessera v1.1 (as an aside, Tessera v2 does fix this, but I'm stuck on v1.1 as Tessera v2 doesn't have global coverage yet).</p>
+<p>Here we can see the difference going from the kNN classifier to the linear classifier:</p>
+<div><div><img src="images-cached/eadd6397c7ec6b8d.png" alt="kNN classifier"><img src="images-cached/ab38ebda76f08e56.png" alt="linear classifier"><div></div><span>kNN classifier</span><span>linear classifier</span></div></div>
+<p>You can see that we go from that light pink urban area to a mix of grey and pink - so somewhat rocky, but not perfect. The white areas are areas where Tessera doesn't have enough data due to somewhat persistent cloud coverage across 2025  btw :) So now if we try to balance the classes (admittedly somewhat naively):</p>
+<div><div><img src="images-cached/ab38ebda76f08e56.png" alt="linear classifier"><img src="images-cached/0af7f19da97af1f4.png" alt="balanced linear classifier"><div></div><span>linear classifier</span><span>balanced linear classifier</span></div></div>
+<p>The mountain tops are now rocky, which is great, but what's happening to the rest of Skye? We suddenly have a lot more variety in the terrain, including &quot;Forest - subtropical/tropical mangrove vegetation above high tide level&quot; 🤦 I'll admit, I've not been to Skye for a few years now, being there <a href="https://www.flickr.com/photos/mdales/49719318683/in/album-72157713697594973">for my sister's wedding in 2018</a>, but I don't think it'll have changed that much that quickly.</p>
+<p>This time, unlike last week, it's not the Woodpigeon that is to blame for my woes, but rather birds like the <a href="https://www.iucnredlist.org/species/22696993/154525233">Grey Heron</a> and <a href="https://www.iucnredlist.org/species/62774969/154819214">Little Egret</a>. In my pipeline we see occurrences of those species, take from the IUCN Redlist the habitats they are known to prefer, and then filter each occurrence by what Open Street Map says is there. Unfortunately whilst the IUCN habitat specification is crude for urban areas, it is quite specific around forests, grasslands, and shrublands, breaking each down to classification based on rough latitude bands: boreal, temperate, subtropical, etc. OSM on the other hand is crude, and says &quot;forest&quot;. Birds like the Grey Heron and Little Egret get their food by fishing, which means coastal areas or river areas in the UK, but in other parts of the world they can do that in Mangrove forests, so the only type of forest that they like isn't to be found in the UK (at least naturally). But when we filter their habitats based on OSM, the best we can say is &quot;someone saw a heron in a forest&quot;, and the only forest a heron likes is mangrove, so this must be a mangrove spot! 🤦</p>
+<p>Now, before, in my kNN classifier there were so few of these it didn't matter that this mistake happened. But if we artificially balance the different classes we have, suddenly all these little mistakes that get through my filtering have their importance made equal to every other class, and bam, we have mangrove forests on Skye :)</p>
+<p>This relates to a problem I'd discussed with my colleagues <a href="https://www.conservation.cam.ac.uk/staff/dr-alison-eyres">Alison Eyres</a> and <a href="https://www.shaneweisz.com/blog">Shane Weiss</a> a while back but hadn't really actioned because it wasn't a problem, but now it is I went back to Ali and we discussed how we might bring in another data source to try and make up for the fact that our current pipeline can't tell that certain types of forest are restricted spatially due to climatic conditions. In the end we've opted for using a combination of <a href="https://en.wikipedia.org/wiki/Biome">biome</a> data from the <a href="https://ecoregions.appspot.com">RESOLVE Ecoregions dataset</a> and the <a href="https://koppen.earth">Köppen-Geiger dataset</a> - both of which are used in the production of the <a href="https://www.nature.com/articles/s41597-020-00599-8">Jung et al habitat map</a>. Unfortunately neither is sufficient alone to try and let me filter occurrences, so I have to use the former, and where it is deficient the latter. There are also cases where they disagree, which is unfortunate, but I think at broad strokes that'll help pin things down.</p>
+<p>But that's where I got to before the week closed, so we'll see how this goes the coming week. Either way, moving off a kNN classifier to something more nuanced is a good move, and actually aligns with the statistical model used in the <a href="https://conbio.onlinelibrary.wiley.com/doi/full/10.1111/cobi.13851">Lumbierres et al paper</a> that I've been inspired by, so I'm pleased with the input from all my colleagues this week.</p>
+<p>Basically this last two weeks, between the classifier work and the validation work, I've had to learn a lot about an area I wading into somewhat uneducated, and so it's been slow in terms of output, but I feel I'm getting a lot out of it, and feel grateful (as ever) to be surrounded with such smart people.</p>
+<h1>Mapping urban wild animals</h1>
+<p>My friend <a href="https://mcqn.net/">Adrian</a> sent me a link to <a href="https://stamen.com/mapping-wild-animals-in-nyc-with-open-and-crowdsourced-data/">mapping wild animals in NYC with open and crowdsourced data</a>. Clearly given the urban bias in data we should be able to do something similar for Liverpool, just not with my habitat map as a basis, as it just says Liverpool is &quot;urban&quot; and so makes for a boring map.</p>
+<p>I live just outside Liverpool, and being a coastal city, the range of wildlife we have here is quite impressive, it feels more so than when I lived just outside Cambridge. I regularly see the aforementioned Little Egrets and Grey Herons whilst cycling between here and Liverpool, we know that there are porpoises in the Mersey, etc. One of the unexpected side effects of moving has been just how much more wildlife I see on a regular basis now that I'm not living in an area dominated by arable farmland. That said, I do miss the Muntjac Deer and Badgers that would regularly visit our garden back in Cambridgeshire - just they would visit at night mostly, so perhaps that's the main difference: there's animals all around if you know where and when to look.</p>
+<h1>Yirgacheffe</h1>
+<p>I was meant to attend <a href="https://uk.osgeo.org/foss4guk2026/">FOSS4G:UK</a> last week, presenting a talk about <a href="https://yirgacheffe.org/">Yirgacheffe</a>, but had to pull out due to being unwell at the last minute, which was disappointing. One thing I've failed to do is solicit more feedback on Yirgacheffe's approach from the GIS open source community and I was hoping this would be a good point to do that, and unfortunately missed out.</p>
+<p>Still, I did a small update release to Yirgacheffe, adding the ability to create vector layers directly from <a href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT</a> (Well Known Text) format, and added support for trig operations like <a href="https://numpy.org/">numpy</a>.</p>
+<p>This does remind me that I need to do an API tidy up in 3.0 to deduplicate how you call things like this. I'm an old Python programmer, and did a lot of Django in the day, and so am very used to <a href="https://en.wikipedia.org/wiki/Method_chaining">method chaining</a>, which means I wrote Yirgacheffe originally like:</p>
+<pre><code><span>    </span><span>result</span><span> </span><span>=</span><span> </span><span>my_layer.</span><span>nan_to_num</span><span>(</span><span>)</span><span>.</span><span>sin</span><span>(</span><span>)</span><span>.</span><span>floor</span><span>(</span><span>)</span><span>
+</span></code></pre>
+<p>But at some point my colleague <a href="https://patrick.sirref.org">Patrick Ferris</a> pointed out that this isn't the idiom used by the data-science libraries my target audience were used to. In numpy you'd write:</p>
+<pre><code><span>    </span><span>cleaned</span><span> </span><span>=</span><span> </span><span>np.</span><span>nan_to_num</span><span>(</span><span>my_data</span><span>)</span><span>
+</span><span>    </span><span>trigged</span><span> </span><span>=</span><span> </span><span>np.</span><span>sin</span><span>(</span><span>cleaned</span><span>)</span><span>
+</span><span>    </span><span>result</span><span> </span><span>=</span><span> </span><span>np.</span><span>floor</span><span>(</span><span>trigged</span><span>)</span><span>
+</span></code></pre>
+<p>And so around the run up to 2.0 (which took about a year) I added support for that too, so with Yirgacheffe you can replace <code>np</code> with <code>yg</code> and you're good to go. But I didn't remove the more object-orientated version, as I quite like that way. But over time, as I've added more and more support for different operators, this is now becoming somewhat of a maintenance pain, particularly as I end up duplicating a lot of test cases for both formats.</p>
+<p>Either I need to look into code generation so that one is automatically derived from the other in a way that is robust and trustworthy, or I probably need to switch to the numpy style and drop the OO style in 3.0.</p>
+<p>Not the end of the world, just an example of the tedium of API design :)</p>
+<h1>This week</h1>
+<ul>
+<li>HABITAT MAPS IT NEVER ENDS. I enjoy the work, I just feel I need a better way to write this bullet point each week.</li>
+<li>The CFP deadline for <a href="https://alpaca.cc">Alpaca Festival</a> is coming up fast, so I had a chat with Patrick about where I'd got to with my browser port of my OCaml graphics library Claudius, as I really want to do a functional-generative-art-in-OCaml talk or workshop. I have two weeks to try to make that a thing.</li>
+</ul></div>
+      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
+      
+    </article>
     
     <article class="post">
       <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
@@ -1554,62 +1629,6 @@ I’m happy with the lessons I learned along the way.</strong></p>
       </div>
       
       <div class="summary">Q&amp;A from a Zoom visit to Gratton Lab (Beckman Institute, UIUC) on how to use — and how not to use — AI tools in research.</div>
-      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
-      
-    </article>
-    
-    <article class="post">
-      <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
-        <div class="post-icon icon-placeholder"></div></a>
-        <div>
-          <h1 class="post-title"><a class="post-link" href="https://digitalflapjack.com/weeknotes/2026-08-03/">Weeknotes: 3rd August 2026</a></h1>
-          <div class="post-meta">
-            <span class="feed-title"><a href="https://digitalflapjack.com">Michael Dales</a></span>
-            <span class="post-date">2026-08-03 10:00 UTC</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="summary"><h1>Last Week</h1>
-<p>Words not come good today - I basically blew all my writing energy on another post that is not yet published (explained below), and so this one will be quite short (other than the later sections, which I wrote as I went along last week).</p>
-<h2>Habitat mapping</h2>
-<p>I've done some more on the habitat mapping front. I implemented a iterative label refinement thing, an implementation of an approach similar to <a href="https://www.ijcai.org/Proceedings/15/Abstracts/568.html">IPAL</a>. This took a lot longer than I expected, mostly as working with GeoTessera is a lot slower than I assumed based on the data volumes I was using - my script ended up taking three hours just to process 50K points. I need to dig into this this week, as I don't know why it was slow, so could just be me being silly. But given how much experimentation I need to do, solving this is kinda key to making any progress. I did get the script to run though, and so now I can try refine the parameters to get better results vs the arbitrary thresholds I initially specified.</p>
-<p>It did cause me to look into the data, which was kinda of interesting. I got 1,009,424 occurrences from GBIF for 2024 in the UK for 182 species I was interested in. This fell just to 58,017 when I filtered for samples within the species range! Now, to be clear, I've not taken all of the range polygons for each species, as I've ignored those labelled as &quot;passage&quot; - but I need to try sense check this, as it feels odd.</p>
-<p>Of those 50K that remained, there's some super obvious biasing going on. If we look at the area around where I live:</p>
-<p></p><div><div><div>
-<img src="images-cached/6efd1847a61236ef.png"></div></div></div><p></p>
-<p>There's clear clustering in the points that remain. If we look at the bits I've highlighted:</p>
-<ol>
-<li>This is <a href="https://www.rspb.org.uk/days-out/reserves/dee-estuary-burton-mere-wetlands">RSPB Burton Mere</a> - so somewhat obvious we get more sightings around nature reserves like this.</li>
-<li>The Leeds and Liverpool canal, a popular walking destination I assume?</li>
-<li>I'm surprised <a href="https://www.nationaltrust.org.uk/visit/liverpool-lancashire/formby">Formby forest</a> isn't more popular, as it's a noted location for <a href="https://www.iucnredlist.org/species/221730864/221731049">Red Squirrels</a>.</li>
-<li>Conversely, I was surprised the town of Southport is so popular! I had a look, and it's mostly common birds, so I assume just there's a local active birding community there.</li>
-<li>A bit of woodlands - seems a common clustering point across the UK.</li>
-<li>I somehow forgot to add 6 :)</li>
-<li>Chester Zoo! Thankfully I filter out by species range, so there are no giraffes in here, but there's a lot of common UK species still tagged here.</li>
-</ol>
-<p>The point is that the GBIF data, in the UK at least, is very unevenly concentrated, which means I have to also allow/adjust for that.</p>
-<p>The final things I did was read through <a href="https://arxiv.org/abs/2603.02080">From Pixels to Patches: Pooling Strategies for Earth Embeddings</a> and a similar discussion thread on our group Zulip, as Tessera beingat 10m is too fine scale for this work really: both the habitat maps I want to produce are for projects running at 1km or so, and the occurrence data is unlikely to be that good for 10m (which might be a part of why I've got so few occurrences).</p>
-<h2>Foundation model explainer</h2>
-<p>I took another go this morning at writing my &quot;what is Tessera&quot;/&quot;what is a geospatial foundation model&quot; explainer, and once again ran out of energy 2/3rds the way through. If nothing else though it's proving useful for refining my own understand of what it is - which ultimately is one of the main benefits of doing any form of teaching.</p>
-<h2>Yirgacheffe tweaks</h2>
-<p>I've started accruing some small updates to <a href="https://yirgacheffe.org/">Yirgacheffe</a>, which at some point I'll bundle into a minor release. To help make interop with <a href="https://pypi.org/project/geotessera/">Geotessera</a> a bit better I've added support for using <a href="https://pypi.org/project/affine/">the Affine package</a> for map projections. Yirgacheffe grew out of trying to wrap <a href="https://gdal.org/">GDAL</a>, so where necessary has been using its regular Python tuple for storing map offset and pixel scale, but GeoTessera is <a href="https://pypi.org/project/rasterio/">Rasterio</a> based, and rasterio uses the Affine package with a different value ordering to GDAL. I've now updated Yirgacheffe to both accept the Affine objects for map projection and offsets, and also return them back when requested.</p>
-<p>I also needed to process some polygon data for Ali, whereby I had to inspect a geopackage to get the metadata to let me pull apart the 200 plus project polygons into individual layers. I've had a ticket on Yirgacheffe to prove access to the data fields in geopackages and geojson for ages, so I finally just fixed that.</p>
-<p>In both cases though this just reminds me of my plan for Yirgacheffe 3.0, which is to support using multiband data (so multiband GeoTIFFs or GeoPackages with many polygons in them) in operators that will then apply operators to each layer individually, allowing us to express parallelism in a declarative fashion. However, I'm not yet contemplating tackling that!</p>
-<h2>PAT testing</h2>
-<p>I went to a workshop at <a href="https://doesliverpool.com/">DoES Liverpool</a> ran by Mike Gorman where I learned about how to <a href="https://www.hse.gov.uk/electricity/faq-portable-appliance-testing.htm">Portable Appliance Testing</a> - aka PAT, which is more commonly referred to as &quot;PAT testing&quot;, living in that special language hell alongside &quot;SCSI interfaces&quot;. I think we're all familiar with PAT being a thing required in most workplaces, so I thought it'd be fun to learn how to do it. It's not actually required by law in the UK that electrical goods are PAT tested<a href="#fn-1">[1]</a>, but it is required that workplaces provide a safe environment, and it's one part of demonstrating that which is why it's so pervasive; similarly insurance providers often require it, again as a standard way to check people are taking things seriously. Interestingly, equipment under a year old doesn't need testing as its assumed to have shipped in good condition.</p>
-<p>Anyway, it was fun learning about the various classes of equipment that need testing, and about the (roughly) two parts of the test: doing a visual inspection to check for damage, check fuses are correct, and so forth, and then using the magic testing box (we were using a <a href="https://www.kewtechcorp.com/products/ezypat/">Kewtech EZYPAT</a>) to check the appliance. Although it's automated quite a bit, you still are engaged in the process with many devices: for example I had to test a extension reel, and the acceptable resistance on an extension reel is a function of the cable length and the diameter of the cores within the cable, so some bookwork is required, as the magic box doesn't know that. If you can remember power equals current times voltage, then you have all the high school physics you need for this.</p>
-<h1>This Week</h1>
-<ul>
-<li>Looking into my Geotessera performance - is it an issue or is it unrealistic expectation?</li>
-<li>Experiment with my label refinement process</li>
-<li>Look to bring in other datasets to augment using specialists to refine generalists.</li>
-</ul>
-
-<ol>
-<li>
-<p>(PATed? I think we should adapt that: we know the server is happy as it's been patted :)</p>
-<span><a href="#ref-1-fn-1">↩︎︎</a></span></li></ol></div>
       <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
       
     </article>
