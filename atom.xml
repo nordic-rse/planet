@@ -56,7 +56,25 @@
 &lt;ul&gt;
 &lt;li&gt;HABITAT MAPS IT NEVER ENDS. I enjoy the work, I just feel I need a better way to write this bullet point each week.&lt;/li&gt;
 &lt;li&gt;The CFP deadline for &lt;a href="https://alpaca.cc"&gt;Alpaca Festival&lt;/a&gt; is coming up fast, so I had a chat with Patrick about where I'd got to with my browser port of my OCaml graphics library Claudius, as I really want to do a functional-generative-art-in-OCaml talk or workshop. I have two weeks to try to make that a thing.&lt;/li&gt;
-&lt;/ul&gt;</summary></entry><entry><title>Weeknotes: 12th October 2026</title><link href="https://digitalflapjack.com/weeknotes/2026-10-12/" rel="alternate"/><updated>2026-10-12T10:00:00+00:00</updated><author><name>Michael Dales</name></author><id>https://digitalflapjack.com/weeknotes/2026-10-12/</id><summary type="html">&lt;h1&gt;Habitat maps&lt;/h1&gt;
+&lt;/ul&gt;</summary></entry><entry><title>Celebrating International RSE Day in Finland</title><link href="https://nordic-rse.org/blog/international-rse-day/" rel="alternate"/><updated>2026-10-19T00:00:00+00:00</updated><author><name>Nordic-RSE</name></author><id>https://nordic-rse.org/blog/international-rse-day/</id><summary type="html">&lt;pre&gt;&lt;code&gt;&lt;span&gt;&amp;lt;img src=&amp;quot;/blog/img/rse-fi-lunch.jpg&amp;quot; style=&amp;quot;width: 400px;&amp;quot; alt=&amp;quot;Picture of the RSE group at lunch.&amp;quot;/&amp;gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On October 8th, we celebrated International Research Software Engineering (RSE) Day with around 
+30 RSE enthusiasts from across the Finnish capital region.
+This year we had double the number of participants from last year, with many attendees bringing along colleagues and friends.
+Sadly, everybody had to pay for their own lunch this year, but that did seem to make it easier for people to join who do not regularly hanging out on the coderefinery zulip. 
+The gathering provided a valuable opportunity to connect with people in similar roles across universities, 
+research organizations, and research infrastructure providers. Some participants met again after previous events, 
+while others connected for the very first time.
+As always, conversations quickly turned to the realities of RSE work. Participants shared both challenges and success stories, 
+exchanged experiences, and strengthened professional networks. We hope everyone left with new contacts and a stronger sense 
+that they are part of a wider community facing many of the same opportunities and challenges.&lt;/p&gt;
+&lt;p&gt;Because Nordic-RSE members are spread across the Nordic countries, opportunities to meet in person are limited, 
+often to just once a year. Regional meetups therefore play an important role in building and maintaining our community. 
+They are especially valuable for RSEs who may be the only software-focused researcher in their group, 
+but also for those fortunate enough to work within established central RSE teams.
+We encourage everyone in the community to gather their local peers from time to time and let others know when you are meeting. 
+Whether it is a simple lunch, an informal meetup, or a larger seminar, every event helps strengthen the RSE network. 
+Nordic-RSE is happy to support these efforts by sharing organizational experience and helping with outreach!&lt;/p&gt;</summary></entry><entry><title>Weeknotes: 12th October 2026</title><link href="https://digitalflapjack.com/weeknotes/2026-10-12/" rel="alternate"/><updated>2026-10-12T10:00:00+00:00</updated><author><name>Michael Dales</name></author><id>https://digitalflapjack.com/weeknotes/2026-10-12/</id><summary type="html">&lt;h1&gt;Habitat maps&lt;/h1&gt;
 &lt;h2&gt;Missing data&lt;/h2&gt;
 &lt;p&gt;As mentioned &lt;a href="https://digitalflapjack.com/weeknotes/2026-10-05/"&gt;last week&lt;/a&gt;, I'm working towards doing a regional habitat map based on global data, to see if we can utilise &lt;a href="https://geotessera.org"&gt;Tessera's&lt;/a&gt; global reach to make up for local data-deficiencies. But in doing this I ended up doing a review what data we were using from &lt;a href="https://gbif.org"&gt;GBIF&lt;/a&gt;, and found a couple of interesting points.&lt;/p&gt;
 &lt;p&gt;The major one was that despite GBIF containing species occurrence data from many different sources, including &lt;a href="https://ebird.org/home"&gt;Cornell's eBird repository&lt;/a&gt; which is often cited in the space I'm working and indeed is used by &lt;a href="https://conbio.onlinelibrary.wiley.com/doi/full/10.1111/cobi.13851"&gt;the Lumbierres et al habitat crosswalk work&lt;/a&gt; the major work I'm building upon, the way I was filtering GBIF meant that the eBird data was being dropped. This is quite major as it turns out 83% of occurrences in Madagascar where we have major data-deficiency issues are in eBird.&lt;/p&gt;
