@@ -167,7 +167,7 @@ search).  See the <a href="https://github.com/nordic-rse/planet/">github
 repo</a> for more info and how
 to add yourself.</p></div>
     
-    <p class="generated">Generated <span class="generated-at">2026-11-02T11:38:50+00:00</span> ·
+    <p class="generated">Generated <span class="generated-at">2026-11-02T23:12:41+00:00</span> ·
       This page and feed are sanitized for security, formatting may be wrong.</p>
     
     <aside class="feeds-sidebar">
@@ -199,6 +199,65 @@ to add yourself.</p></div>
     
     <div class="post-flow">
 
+    
+    <article class="post">
+      <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
+        <div class="post-icon icon-placeholder"></div></a>
+        <div>
+          <h1 class="post-title"><a class="post-link" href="https://digitalflapjack.com/weeknotes/2026-11-02/">Weeknotes: 2nd November 2026</a></h1>
+          <div class="post-meta">
+            <span class="feed-title"><a href="https://digitalflapjack.com">Michael Dales</a></span>
+            <span class="post-date">2026-11-02 10:00 UTC</span>
+          </div>
+          <p class="content-note">Some embedded content from this post is not shown here (iframe) - consider seeing the original post.</p>
+        </div>
+      </div>
+      
+      <div class="summary"><h1>Coping with the loss of a loved server</h1>
+<p>On Sunday I got one of those chat messages one doesn't want to read: the SSD in the big machine I've been using for the habitat work was severely degraded, and so work was stopped on that machine, and I had to find a new home for my habitat map work.</p>
+<p>For the last year or so most of the work I've done on biodiversity pipelines I've done on the Mac Studio that sits on my desk: with 32 CPU cores, 80 GPU cores, and half a terabyte of RAM this machine is no slouch. At the same time calculating global biodivesity metrics for tens of thousands of species at 100m per pixel is a tough job for any computer. At 100m per pixel a global raster is 150 GB in size, and so 34k * 4 layers at 150GB * multiple scenarios is a lot of data to chew through. But thankfully the work in these metrics is very GPU friendly, and because <a href="https://yirgacheffe.org">Yirgacheffe</a> supports Apple Silicon GPUs thanks to <a href="https://ml-explore.github.io/mlx/build/html/index.html">MLX</a>, the Mac Studio was the fastest machine I have access to for this particular workload. For the habitat map work though, I had moved to using our largest AMD EPYC server, which sports 768 CPU cores, no GPU cores, and 3TB of RAM. There were two reasons for this. The main reason when I started was access to <a href="https://geotessera.org">Tessera</a>, which as a 10m-per-pixel model with 128 layers in it, takes a serious amount of storage, so I needed to be on the University network where we had enough of Tessera. The other reason is that the naive machine learning code I was writing was much better to CPU parallelism than my GPU heavy but CPU light Mac Studio.</p>
+<p>However, a machine with a (currently) working SSD is better than one with no SSD, so the start of my week was trying to move the habitat work to my Mac Studio.</p>
+<p>Firstly, this is good disaster recovery practice. It's been a while since I had a disk fail on me, but it's certainly not the first time, so I like to think I was reasonably prepared for this. Everything is pushed to github, and I build my pipelines in general to not rely of random data downloads, but rather the pipeline scripts have in them fetching data from primary sources. But perhaps predictably I'd missed some things. For instance, I <a href="https://digitalflapjack.com/weeknotes/2026-10-19">recently</a> added a dependancy on biome data from the <a href="https://ecoregions.appspot.com">RESOLVE ecoregions dataset</a>, and I wasn't sure that idea would work, so I just took a copy I already had, and then failed to add the download to the snakemake rules for the pipeline once I had decided that idea worked. The more interesting gotchya was that around some scripts for tidying up <a href="https://ebird.org/home">eBird</a> data. I've mentioned before I think that this is the one project where <a href="https://digitalflapjack.com/weeknotes/2026-11-02/">I'm using Claude Code</a> as the primary code interface, and how I'm trying to understand how one can use a tool like this and still have any relationship to the finished artefact. I general this has been working okay, but I found a couple of places where for data we have to manually download (i.e., the eBird database), which required a little pre-processing for our pipeline, those pre-processing scripts had not been added to the regular code base, Claude Code had just used temporary scripts to do a one off job, and those were lost. This error is totally on me, Claude Code is just a tool, and in general I do not assume it has done the right thing, but I missed these ones and had to pay the penance of recreating them myself.</p>
+<p>I say recreating them myself, because moving to the Mac Studio has meant I've not been using Claude Code, as I don't trust it in auto mode outside of a Docker container or some other sandbox, but if I'm to hope to get any performance out of the pipeline on my Mac Studio I'll need access to the GPUs, which I can't currently do that way. Thus this week I've been playing with the pipeline directly again, and that has been a nice confirmation that my strategy of getting Claude Code to build many small scripts that do a single transformation in the pipeline, and getting it to follow my own coding style preferences has made it easy to transition to manual control.</p>
+<p>On the topic of performance, I had to make two changes. The first was a physical change to my working environment, which involves an ethernet cable now going out of my office window, down one floor and across one room, and then into another window where the broadband router is:</p>
+<p></p><div><div><div>
+<img src="images-cached/511cff1959d1d47f.jpg"></div></div></div><p></p>
+<p>Basically the walls of our house are sufficiently thick that I don't get the best wifi reception, and my attempt to use homeplug style powerline ethernet has not been any better. But for most of what I do the performance has been okay, so I've not bothered to fix it. But suddenly I needed more performance to let me stream Tessera embeddings from S3, and so I finally did what I've been joking about with my partner for a while, and throw a cable out the window of my office and into our living room. Suddenly I went from around 100 megabit to 1.6 gigabit, and what initially looked like it'd take 24 hours to just stream the UK data for Tessera suddenly took a tractable amount of time. Obviously this isn't a long term solution, but it is worryingly close to one of those temporary solutions that works well enough that it'll still be there this time next year if I'm not careful.</p>
+<p>Tangentially, it was a nice reminder also that, being somewhat old, my head was still stuck in the &quot;gigabit ethernet is fast ethernet&quot; - I realised this because all our ethernet switches in the house are 1 gigabit max and I ran out of ports on the broadband router. Let it be known that I prioritised habitat map production over my Xbox connection :) I fear a set of new home ethernet switches will be on the xmas shopping list.</p>
+<p>Back to the habitat map work, the other change was to try get the pipeline to use some GPU on this Mac Studio. Thankfully someone has made <a href="https://github.com/tabulai/mlx-learn">mlx-learn</a> an MLX accelerated version of <a href="https://scikit-learn.org">scikit-learn</a>. With that I have the pipeline running at a usable speed on my Mac Studio, though not as fast as the AMD EPYC server, because this pipeline just isn't as GPU formatted as my other pipelines.</p>
+<p>So whilst not a simple switchover, overall I think I survived the sudden loss of my regular compute environment pretty well. Now, a week later, the AMD EPYC server is back in action, so I will be switching back I think, as it lets me iterate much quicker, but a week reset was a good reality check for both how robust my code management at arms length has been, and where some of the performance bottlenecks are.</p>
+<h1>ETOOMANYTWITCHERS</h1>
+<p>On the science side of the habitat maps, the main thing I hit up against was just how unevenly distributed datasets around species data are. To give you a sense of the problem here's a heatmap of eBird observations from 2025:</p>
+<p></p><div><div><div>
+<img src="images-cached/5d6f71110bb3b982.png"></div></div></div><p></p>
+<p>This density of data actually gives us two distinct but linked challenges: firstly we're data starved in many parts of the world (particularly those ones we need to protect the most), and we have (for my purposes) too much data in data rich parts of the world.</p>
+<p>The challenge is highlighted for me in my habitat maps when I try to use this data to validate my output. In the UK my map scores around 75% validation currently without eBird data, but that drops to around 60% with eBird data. Digging into this it's because in the UK we don't just record the regular species, but we record all of the outliers too - birds that have wondered out of their usual area. Indeed, bird watchers will be particularly keen to spot atypical species, so are perversely motivated to find occurrences that go against the general trend. In general, this is good recording for science, particularly as climate impacts disrupt habitats, but for a map like mine it becomes problematic. Obviously there's things I can do to thin down the data, but I need to be careful because if I apply those same rules to Madagascar or such then we start to remove data from what is already a very limited data set.</p>
+<p>I've been trying to find guidance from what other people have done in this space, as I feel this can't be a novel problem. The best I've found thus far is <a href="https://www.researchgate.net/publication/331696708_Best_practices_for_making_reliable_inferences_from_citizen_science_data_case_study_using_eBird_to_estimate_species_distributions">this paper</a> by Johnston et al 2020, though like much in the occurrence space I feel this is aimed at dealing with areas where there is too little data rather than too much (and the tension when you have both). Thankfully it turns out that the first author of that paper, Alison Johnston, <a href="https://www.conservation.cam.ac.uk/events/cri-seminar-tracking-nature-citizen-science-data">is visiting Cambridge next week to give the CRI Seminar</a> and so I've booked a slot to talk to her about the problem and see if she can point me in the right direction. For now I'm just going to take the poor score in the UK on the chin and move on focussing on the areas we care about more where having the eBird data helps more than it hinders.</p>
+<h1>Alpaca Festival submission</h1>
+<p>After I havered about it too long, I finally caught up with <a href="https://patrick.sirref.org">Patrick Ferris</a> and we decided to do a <a href="https://calls.alpaca.cc/2027/talk/review/X79M3LGV9M3TYKW9K3LKBSELYGWV79NB">workshop submission</a> to <a href="https://alpaca.cc">Alpaca Festival</a>, based around trying to teach functional programming concepts as they apply to algorithmic art. This is something that I've been interested in ever since I started messing around with graphics programming in <a href="https://ocaml.org">OCaml</a> with my <a href="https://claudiusfx.org/claudius/index.html">Claudius graphics library</a>. You can see me talk about Claudius and about how a lot of the demo style effects I make in it are inherently functional in style in my FunOCaml talk from a couple  of years ago:</p>
+<div><div><div></div></div></div>
+<p>Back <a href="https://digitalflapjack.com/weeknotes/2026-08-31/">in August</a> I took a stab at porting Claudius from SDL to Javascript, using <a href="https://ocsigen.org/js_of_ocaml/latest/js_of_ocaml/index.html">JS of OCaml</a>, which lets you run OCaml code in a browser by compiling the OCaml byte code format to Javascript. This worked, despite a few rough edges. This then inspired Patrick who has been playing with getting OCaml playgrounds to run in a browser to make one that works with Claudius as it's main feature:</p>
+<p></p><div><div><div>
+<img src="images-cached/34f117105dda577f.png"></div></div></div><p></p>
+<p>This in turn motivated me to improve of the JS port, adding some simpler APIs to make the playground code no longer expose the HTML canvas lookup, and bam, we have the premise for a nice tool that is both useful for trying to teach OCaml and functional programming methodologies to artists, and also perhaps encouraging new people to try OCaml thanks to the fun and interactive nature of doing graphics programming.</p>
+<p>There's a bunch of polish still required before we put this in front of a wider audience, but Alpaca Festival is in May next year, so we have time to make it more slick. We have a rudimentary save feature that needs tweaking, and I'd like to have a way to save the compiled JS so you can embed it in your own web pages to show off your creations. I'd also like to work in <a href="https://claudiusfx.org/demos/">all the examples</a> into the playground to give some different starting points.</p>
+<p>Still, the submission is in, so now it's crossing fingers until we get old if we're successful or not.</p>
+<h1>30 day map challenge</h1>
+<p>I'll probably regret this, but I have started <a href="https://30daymapchallenge.com">30 Day Map Challenge</a> - making a map a day based on the prompts provided. I tried this a couple of years ago an quickly aborted it due to challenges with open data that wasnt' really open making it hard to share progress. This year I have an side-project that this somewhat aligns with, so I'm going to use this as a way to chip away a little each day towards that. This means probably the maps for a given day won't be amazing, but at some point I can hopefully pull it all together into the proper side-quest thing and everyone will be &quot;wow, now I see what you were doing&quot;. Or perhaps not.</p>
+<p>The Day 1 prompt was &quot;points&quot;, and for that I simply plotted occurrence data from <a href="https://www.gbif.org">GBIF</a> that I was using for the habitat map work on a map.</p>
+<p></p><div><div><div>
+<img src="images-cached/3d14d650fce307cd.png"></div></div></div><p></p>
+<p>The map is small, because the side-project demands it to be so, but you can hopefully still make out the area around North Wales, the Wirral, and Liverpool up to Blackpool that it is showing. This is knocked up in OCaml using Claudius, as is my jam, and it was a fun excuse to try out <a href="https://github.com/geocaml/ocaml-proj">Patrick's OCaml bindings</a> for <a href="https://proj.org/en/stable/">PROJ</a>, which is the standard map projection conversion library, as I'm drawing things in British National Grid (EPSG:27700) rather than using some mercator style projection.</p>
+<p>The one thing I did think was interesting about the map is how Liverpool City Centre disappears - not much in the way of species observations in the city centre, despite urban as a category making up a significant proportion of species observations in the UK.</p>
+<h1>This week</h1>
+<ul>
+<li>With the AMD EPYC server back, a return to habitat map progress. Whilst having to do some house keeping was good, it's put me back a week which is less good.</li>
+<li>Fix my tangled knot: there was a major update to <a href="https://tangled.sh">Tangled</a> last week, including switching their tooling from Go to Rust, which means I can no longer  build the knot  software on my VPS, despite it having 4GB of RAM 🤦 Thankfully <a href="https://oppi.li">Akshay Oppiliappan</a> has said there will be binary packages soon.</li>
+<li>Ping people to let them know I'll be in Cambridge next week to set up meeting slots!</li>
+</ul></div>
+      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
+      
+    </article>
     
     <article class="post">
       <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
@@ -1608,41 +1667,6 @@ I’m happy with the lessons I learned along the way.</strong></p>
 <li>More habitat map experiments</li>
 <li>I need to send some data to people, which is still an annoying process for things I can't publish for everyone</li>
 <li><a href="https://oshug.org/event/oshcamp2026">Open Source Hardware Camp 2026</a></li>
-</ul></div>
-      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
-      
-    </article>
-    
-    <article class="post">
-      <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
-        <div class="post-icon icon-placeholder"></div></a>
-        <div>
-          <h1 class="post-title"><a class="post-link" href="https://digitalflapjack.com/weeknotes/2026-08-19/">Weeknotes: 19th August 2026</a></h1>
-          <div class="post-meta">
-            <span class="feed-title"><a href="https://digitalflapjack.com">Michael Dales</a></span>
-            <span class="post-date">2026-08-19 10:00 UTC</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="summary"><h1>Last week</h1>
-<p>Both tardy and sparse weeknotes. Sparse as I had my second shingles vaccine last week which took me out for a day, but better a day feeling unwell now than a potentially unlimited amount of unwellness in the future.</p>
-<h2>Puntcon</h2>
-<p>My weeknotes are a little tardy because I was down in Cambridge briefly. On Sunday it was Puntcon, the somewhat annual get together of technologists, artists, and social scientist types (and anyone else who is interested). As ever, a fun time chatting to interesting people, and one idea that I need to find time to try prototype before I forget.</p>
-<h2>Habitat maps</h2>
-<p>I've continued to push along on the habitat map work. The UK maps are reasonably well refined now, but the UK is the beginner level/easy mode for this sort of thing: the UK is incredibly data rich, and so I need to start looking at other parts of the world now to see if my method is going to work in other areas or be useless due to a lack of data. To be clear, I'm not finished in the UK, but I feel I've de-risked the UK part significantly, so now I want to de-risk it going global. Ultimately, whilst it's nice it's showing promise in the UK, for the applications where I want to apply this work the UK isn't that interesting.</p>
-<p>You can see the aforementioned data disparity if you look at this <a href="https://api.gbif.org/v2/map/demo1.html#map=3/-372941.42/640494.36/0">heat map of GBIF occurrences</a>:</p>
-<p></p><div><div><div>
-<img src="images-cached/594030f8e2e18f75.png"></div></div></div><p></p>
-<p>Similarly for <a href="https://openstreetmap.org">OpenStreetMap</a> data - as much as I adore OSM, you do see the availability of data fall of once you get outside populated areas. Even within Europe, when I was <a href="https://digitalflapjack.com/weeknotes/rendering%20156%20km%5E2%20of%20swedish%20forest%20in%20minecraft/">looking at the area around Kullberg, Sweden, to make a Minecraft map</a> I found none of the buildings in that area were in OSM and I had to instead use the national buildings database.</p>
-<p>As a concrete example of that data deficit and going back to GBIF, if I take occurrences of terrestrial vertebrate species in the UK I have around 80K points for 2024, but for Minas Gerais, one of the states of Brazil, which is 2.5 times the size of the UK, I have just 600 points for 2024.</p>
-<p>The other challenge with operating outside the UK is it's harder for me to personally eye-ball the results and know if they're comically bad or not. Thankfully I've had some people come forward that can help me: <a href="https://www.researchgate.net/profile/Vinicius-Tonetti">Vinicius Tonetti</a> has just joined the group I worked with on the LIFE metric, and he has experience with the Minas Gerais region (which is why I'm looking at it), and Anil connected me with <a href="https://www.bangor.ac.uk/research-students/sens/miranda-lam-715557/en">Miranda Lam</a> at Bangor University who is working with ground truths in Madagascar. I should say reconnected, as Miranda was working on the Tropical Moist Forest based project that I first started on when I joined the University.</p>
-<p>I'm also being nudged to move to v2 of Tessera, which is in beta, over the v1.1 I'm currently using. Seems this is getting to the point where for early projects like mine it's good enough, and by the time I'm doing things seriously it'll be closed to production.</p>
-<h1>This week</h1>
-<ul>
-<li>Tessera group show-and-tell meeting in Cambridge</li>
-<li>Meeting up with lots of other peopel whilst I'm in Cambridge</li>
-<li>Pressing on with the habitat map work outside the UK</li>
 </ul></div>
       <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
       
