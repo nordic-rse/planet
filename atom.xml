@@ -40,7 +40,45 @@
 &lt;li&gt;With the AMD EPYC server back, a return to habitat map progress. Whilst having to do some house keeping was good, it's put me back a week which is less good.&lt;/li&gt;
 &lt;li&gt;Fix my tangled knot: there was a major update to &lt;a href="https://tangled.sh"&gt;Tangled&lt;/a&gt; last week, including switching their tooling from Go to Rust, which means I can no longer  build the knot  software on my VPS, despite it having 4GB of RAM 🤦 Thankfully &lt;a href="https://oppi.li"&gt;Akshay Oppiliappan&lt;/a&gt; has said there will be binary packages soon.&lt;/li&gt;
 &lt;li&gt;Ping people to let them know I'll be in Cambridge next week to set up meeting slots!&lt;/li&gt;
-&lt;/ul&gt;</summary></entry><entry><title>Weeknotes: 26th October 2026</title><link href="https://digitalflapjack.com/weeknotes/2026-10-26/" rel="alternate"/><updated>2026-10-26T10:00:00+00:00</updated><author><name>Michael Dales</name></author><id>https://digitalflapjack.com/weeknotes/2026-10-26/</id><summary type="html">&lt;h1&gt;Pipeline reporting&lt;/h1&gt;
+&lt;/ul&gt;</summary></entry><entry><title>CodeRefinery at NLTU: practical skills for projects and research</title><link href="https://coderefinery.org/blog/coderefinery-nltu-lviv/" rel="alternate"/><updated>2026-10-30T00:00:00+00:00</updated><author><name>CodeRefinery</name></author><id>https://coderefinery.org/blog/coderefinery-nltu-lviv/</id><summary type="html">&lt;p&gt;Some embedded content from this post is not shown here (SVG image) - consider seeing the original post.&lt;/p&gt;&lt;div&gt;
+&lt;div&gt;
+
+&lt;div&gt;&lt;strong&gt;Ukrainian National&lt;br&gt;Forestry University&lt;/strong&gt;&lt;br&gt;&lt;span&gt;Lviv, Ukraine&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;img src="https://nordic-rse.org/planet/images-cached/022f90297db8e527.png" alt="CodeRefinery" width="140"&gt;
+&lt;/div&gt;
+&lt;p&gt;At &lt;a rel="external" href="https://www.nltu.edu.ua/"&gt;Ukrainian National Forestry University&lt;/a&gt; (NLTU) in Lviv, Ukraine, students from different years have come together to explore practices that make software more reliable, understandable and easier to develop together.&lt;/p&gt;
+&lt;p&gt;Our local workshop builds on &lt;a rel="external" href="https://coderefinery.org/lessons/"&gt;CodeRefinery's open learning materials&lt;/a&gt;, with teaching in Ukrainian and a strong emphasis on practice. I organised and taught the sessions, adapting the materials for our students. The aim is to help them connect programming with skills they can apply in their own projects, future research and professional work.&lt;/p&gt;
+&lt;img width="100%" src="https://nordic-rse.org/planet/images-cached/33cca69f604f098f.png" alt="Workshop participants posing together at NLTU in front of a screen displaying the CodeRefinery logo."&gt;
+&lt;p&gt;&lt;em&gt;Participants of the local CodeRefinery workshop at NLTU in Lviv.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;From individual coding to collaborative work&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;We explored version control and collaboration through Git and GitHub: keeping a clear history, understanding changes and reviewing contributions to shared work. These practices help students approach software as something that other people may need to understand, maintain and extend.&lt;/p&gt;
+&lt;p&gt;Testing introduced a key principle: &lt;strong&gt;a program can run without errors and still produce the wrong result&lt;/strong&gt;. Working with Python and pytest helped us discuss how to check expected behaviour and identify mistakes when code changes. We also introduced continuous integration with GitHub Actions and YAML workflows, showing how automated checks can become a regular part of development.&lt;/p&gt;
+&lt;p&gt;AI-assisted coding, including GitHub Copilot, was considered within the same framework. AI can support development, while understanding proposed changes, reviewing them and checking their behaviour remain the developer's responsibility. README documentation and software licences completed the picture: making a project understandable and clarifying how its code may be reused.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Skills that carry into projects and research&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The value of these topics extends beyond the workshop. Students can apply them in coursework, team projects, research scripts and professional development. A clear history helps explain how code evolved. Tests help check calculations. Documentation helps someone else run and understand the work. Together, these habits provide a foundation for more reproducible and reusable software.&lt;/p&gt;
+&lt;p&gt;For NLTU, the initiative connects software engineering education with practices that support open research and effective teamwork. It gives students an opportunity to develop these habits early and carry them into more demanding projects as their studies progress.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Open materials, a local learning community&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;CodeRefinery's materials gave us a shared foundation that could be adapted to our language, schedule and students' needs. Teaching in the same classroom creates space for questions, discussion and learning across different years of study. The materials also remain available for students to revisit after the sessions.&lt;/p&gt;
+&lt;p&gt;Our aim is for the workshop to become a starting point for continued use of these practices at the university.&lt;/p&gt;
+&lt;div&gt;
+
+
+&lt;a href="https://coderefinery.org/blog/nltu-practice.png"&gt;&lt;img src="https://nordic-rse.org/planet/images-cached/5f564a1b1e09bc1d.png" alt="Participants working on laptops together during a workshop session at NLTU."&gt;&lt;/a&gt;
+
+Learning together in the classroom.
+
+
+
+&lt;a href="https://coderefinery.org/blog/nltu-presentation.png"&gt;&lt;img src="https://nordic-rse.org/planet/images-cached/5d6f45e3218efc6e.png" alt="A workshop session at NLTU with participants at laptops and a shared screen displaying code."&gt;&lt;/a&gt;
+
+Connecting shared explanations with individual practice.
+
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Acknowledgements&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;We thank Samantha Wittke and the CodeRefinery community for the open educational resources, encouragement and practical guidance that supported this local initiative. We also thank our university and the Department of Software Engineering for their support, and the students for their engagement and willingness to learn together.&lt;/p&gt;
+&lt;p&gt;Our experience shows one way that &lt;a rel="external" href="https://coderefinery.org/lessons/"&gt;CodeRefinery's learning materials&lt;/a&gt; can reach students through local teaching. We hope it encourages other educators to explore how these resources could support their own learning communities.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Yuriy Paslavskyi — Teaching Assistant, &lt;a rel="external" href="https://www.nltu.edu.ua/navchalni-pidrozdily/nni-kompiuternykh-nauk-ta-informatsiinykh-tekhnolohii/kafedra-inzhenerii-prohramnoho-zabezpechennia"&gt;Department of Software Engineering&lt;/a&gt;, Ukrainian National Forestry University, Lviv, Ukraine.&lt;/em&gt;&lt;/p&gt;</summary></entry><entry><title>Weeknotes: 26th October 2026</title><link href="https://digitalflapjack.com/weeknotes/2026-10-26/" rel="alternate"/><updated>2026-10-26T10:00:00+00:00</updated><author><name>Michael Dales</name></author><id>https://digitalflapjack.com/weeknotes/2026-10-26/</id><summary type="html">&lt;h1&gt;Pipeline reporting&lt;/h1&gt;
 &lt;p&gt;One thing that I've been meaning to do for ages is look into automatically generating pipeline reports for a given run of one of the data-science pipelines I've built. These pipelines aggregate so much data and generate so much summary data that sits on disk that people only look at the final output raster typically, and only really dig into that data if there's an obvious flaw. Instead I want to make it easier to spot mistakes early, for example: did we drop half a dozen input species for no reason since the last run? how do we compare to prior work in terms of validation scores? what are the numbers of pixels of a given colour and does it reflect what we expect?&lt;/p&gt;
 &lt;p&gt;In one of the first ecological data-science projects I worked on with &lt;a href="https://patrick.sirref.org"&gt;Patrick Ferris&lt;/a&gt; we achieved some of this to a degree. We attempted to build a &lt;a href="https://en.wikipedia.org/wiki/Literate_programming"&gt;literate programming&lt;/a&gt; pipeline description (using a tool we built called &lt;a href="https://github.com/quantifyearth/shark/"&gt;Shark&lt;/a&gt;), and in the pipeline runner Patrick added some code to visualise common outputs if you drilled down in the pipeline-stage graph, but it was still (to me at least) a little overwhelming if you didn't know the pipeline inside out.&lt;/p&gt;
 &lt;p&gt;Anyway, after saying I'd like this sort of thing for several years, I finally decided to stop waiting for perfect, and just implement something specific for this habitat map pipeline I've been working on, and now I have a nice PDF report being generated for a given run:&lt;/p&gt;
