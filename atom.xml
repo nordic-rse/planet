@@ -1,5 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nordic-RSE blog planet</title><link href="https://nordic-rse.org/planet/" rel="alternate"/><link href="https://nordic-rse.org/planet/atom.xml" rel="self"/><id>urn:uuid:7fd32cd4-fd62-48f3-9052-920208210fb4</id><updated>2026-11-09T19:00:00+00:00</updated><entry><title>Weeknotes: 9th November 2026</title><link href="https://digitalflapjack.com/weeknotes/2026-11-09/" rel="alternate"/><updated>2026-11-09T19:00:00+00:00</updated><author><name>Michael Dales</name></author><id>https://digitalflapjack.com/weeknotes/2026-11-09/</id><summary type="html">&lt;p&gt;Some embedded content from this post is not shown here (iframe, input) - consider seeing the original post.&lt;/p&gt;&lt;h1&gt;Habitat map work&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nordic-RSE blog planet</title><link href="https://nordic-rse.org/planet/" rel="alternate"/><link href="https://nordic-rse.org/planet/atom.xml" rel="self"/><id>urn:uuid:7fd32cd4-fd62-48f3-9052-920208210fb4</id><updated>2026-11-12T00:00:00+00:00</updated><entry><title>Making CodeRefinery lessons machine-readable</title><link href="https://coderefinery.org/blog/fair-lesson/" rel="alternate"/><updated>2026-11-12T00:00:00+00:00</updated><author><name>CodeRefinery</name></author><id>https://coderefinery.org/blog/fair-lesson/</id><summary type="html">&lt;p&gt;CodeRefinery lessons are now one step more FAIR (Findable, Accessible, Interoperable, Reusable).
+Each lesson now describes itself in a way machines can understand, is archived on Zenodo with
+every release, and keeps all of this information in a single file.
+Here is a short look at why and how we did it.&lt;/p&gt;
+&lt;h2&gt;Why?&lt;/h2&gt;
+&lt;p&gt;We started by adding a &lt;a rel="external" href="https://citation-file-format.github.io/"&gt;CITATION.cff&lt;/a&gt; file to every
+lesson repository, so that everyone who contributes to a lesson gets proper credit, visible
+directly on GitHub through the "Cite this repository" button.&lt;/p&gt;
+&lt;p&gt;But being citable is only part of being FAIR. For training material to be &lt;em&gt;findable&lt;/em&gt;, search
+engines, catalogs and registries need to know what a lesson is about: its topic, level,
+language and learning objectives. For this kind of metadata, we chose
+&lt;a rel="external" href="https://bioschemas.org/"&gt;Bioschemas&lt;/a&gt;, a community extension of schema.org that also covers
+training materials.&lt;/p&gt;
+&lt;h2&gt;How?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Metadata in the lesson pages:&lt;/strong&gt; Our lessons are built with Sphinx. The &lt;a rel="external" href="https://biocorecrg.github.io/sphinx-bioschemas/"&gt;&lt;code&gt;sphinx-bioschemas&lt;/code&gt;
+extension&lt;/a&gt; (thanks to Toni Hermoso for creating the extension!) embeds the Bioschemas metadata into the generated web pages,
+invisible to readers but readable by search engines and services like OpenAIRE.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;A DOI for every release:&lt;/strong&gt; Each lesson publishes new releases to
+&lt;a rel="external" href="https://zenodo.org/"&gt;Zenodo&lt;/a&gt; using a GitHub Actions workflow. We use our own workflow instead
+of GitHub's built-in Zenodo integration because it lets us include richer metadata, such as
+educational level and learning objectives. All releases of a lesson are collected as versions
+of one Zenodo record.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;One file instead of three:&lt;/strong&gt; With CITATION.cff, Bioschemas metadata and Zenodo metadata, the
+same information had to be updated in up to three places. Now maintainers only edit a single
+&lt;code&gt;metadata.yml&lt;/code&gt;. The other files are generated from it automatically, and the Zenodo workflow
+reads it directly.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Want to know more?&lt;/h2&gt;
+&lt;p&gt;The details are documented in our manuals, which you are welcome to reuse for your own lessons:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a rel="external" href="https://coderefinery.github.io/manuals/lesson-fair/"&gt;Making lessons FAIR&lt;/a&gt;: the overall picture&lt;/li&gt;
+&lt;li&gt;&lt;a rel="external" href="https://coderefinery.github.io/manuals/lesson-metadata/"&gt;Lesson metadata&lt;/a&gt;: how &lt;code&gt;metadata.yml&lt;/code&gt; works and what is generated from it&lt;/li&gt;
+&lt;li&gt;&lt;a rel="external" href="https://coderefinery.github.io/manuals/lesson-version/"&gt;Lesson versions and releases&lt;/a&gt;: how releases end up on Zenodo&lt;/li&gt;
+&lt;/ul&gt;</summary></entry><entry><title>Weeknotes: 9th November 2026</title><link href="https://digitalflapjack.com/weeknotes/2026-11-09/" rel="alternate"/><updated>2026-11-09T19:00:00+00:00</updated><author><name>Michael Dales</name></author><id>https://digitalflapjack.com/weeknotes/2026-11-09/</id><summary type="html">&lt;p&gt;Some embedded content from this post is not shown here (iframe, input) - consider seeing the original post.&lt;/p&gt;&lt;h1&gt;Habitat map work&lt;/h1&gt;
 &lt;p&gt;On the habitat map work I went back to the input stages again, and actually did a bunch of data-spelunking. This meant quite a few days of just looking at dots on maps and asking why is that dot that colour and another another colour, the colour being the assumed habitat at that point from species obsevations.&lt;/p&gt;
 &lt;div&gt;&lt;div&gt;&lt;img src="https://nordic-rse.org/planet/images-cached/085c2bb5952aea05.png" alt="OSM with occurrences"&gt;&lt;img src="https://nordic-rse.org/planet/images-cached/0831594993398e36.png" alt="Satellite with occurrences"&gt;&lt;div&gt;&lt;/div&gt;&lt;span&gt;OSM with occurrences&lt;/span&gt;&lt;span&gt;Satellite with occurrences&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;This lead to a bunch of discoveries and then improvements in how I'm trying to clean up the species occurrence data. I say improvements, but let's quantify that a little in a moment after I say what I did.&lt;/p&gt;
