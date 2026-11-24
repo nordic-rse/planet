@@ -167,7 +167,7 @@ search).  See the <a href="https://github.com/nordic-rse/planet/">github
 repo</a> for more info and how
 to add yourself.</p></div>
     
-    <p class="generated">Generated <span class="generated-at">2026-11-23T13:35:30+00:00</span> ·
+    <p class="generated">Generated <span class="generated-at">2026-11-24T02:32:32+00:00</span> ·
       This page and feed are sanitized for security, formatting may be wrong.</p>
     
     <aside class="feeds-sidebar">
@@ -199,6 +199,134 @@ to add yourself.</p></div>
     
     <div class="post-flow">
 
+    
+    <article class="post">
+      <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
+        <div class="post-icon icon-placeholder"></div></a>
+        <div>
+          <h1 class="post-title"><a class="post-link" href="https://digitalflapjack.com/weeknotes/2026-11-23/">Weeknotes: 23rd November 2026</a></h1>
+          <div class="post-meta">
+            <span class="feed-title"><a href="https://digitalflapjack.com">Michael Dales</a></span>
+            <span class="post-date">2026-11-23 09:00 UTC</span>
+          </div>
+          <p class="content-note">Some embedded content from this post is not shown here (iframe, input) - consider seeing the original post.</p>
+        </div>
+      </div>
+      
+      <div class="summary"><h1>Icelandic challenges</h1>
+<p>I mentioned at the end of <a href="https://digitalflapjack.com/weeknotes/2026-11-16/">last week's weeknotes</a> that for fun I'd build a habitat map of Iceland, and that off the bat it was a little obviously wrong, with glaciers appearing confidently as wetlands. This was just one of a series of spanners that the map threw into the works, so I ended up spending time trying to understand what is going on with the Iceland map and working out what I can possibly do about it.</p>
+<hr>
+<p>We'll start with the glaciers-as-wetlands issue as we've already brought that one up. The root cause here is somewhat amusing, to me at least. It stems from two things:</p>
+<ol>
+<li>There a no species occurrences on glaciers, and my habitat map generation is ultimately driven by species occurrence data</li>
+<li>The <a href="https://www.iucnredlist.org/resources/guidelines/habitat-classification-scheme">IUCN Habitats Classification Scheme (Version 3.1)</a> has no classification for glacier, ice, snow, etc.</li>
+</ol>
+<p>So, there was no data to drive glaciers, and even if there was, we'd not be able to derive the habitat as in the habitat scheme we're targeting it doesn't exist anyway. Whilst at the rate of climate change might eventually prove this right, it is an interesting gap in the scheme. The IUCN are slowly transitioning away from the current habitats classification scheme to their newer <a href="https://global-ecosystems.org">Global Ecosystem Typology (GET)</a>, which covers a much wider range of realms in more detail - and indeed includes <a href="https://global-ecosystems.org/explore/groups/T6.1">T6.1 Ice sheets, glaciers, and perennial snowfields</a>. The description there gives you a clue as to perhaps why it's not in the original scheme: they're basically too cold for anything beyond micro-organisms to exist there. Still, as a habitat cartographer that doesn't help me make a map.</p>
+<p>Looking at the two other habitat maps that I'm holding my map against we can see two different solutions to this. <a href="https://zenodo.org/records/4058819">Jung et al</a> classify the areas &quot;6. Rocky Areas (e.g., inland cliffs, mountain peaks)&quot; which I guess will eventually be true at current trajectories, but isn't true for current maps and will lead to significant over-prediction in Iceland for species <a href="https://pubmed.ncbi.nlm.nih.gov/31324345/">Area Of Habitat (AOH) maps</a>, <a href="https://conbio.onlinelibrary.wiley.com/doi/full/10.1111/cobi.13851">Lumbierres et al</a> has no translation from the original <a href="https://land.copernicus.eu/en/products/global-dynamic-land-cover">Copernicus land cover map</a>, so effectively leaves these areas out, which is a better solution in my book: these areas just down't exist in the classification system we're all targeting.</p>
+<p>However, whilst my habitat method is inspired by the Lumbierres et al approach, leaving a blank isn't going to work for me, because using the <a href="https://geotessera.org">Tessera foundation model</a> to generate the map from occurrence labels will always want to predict something for every pixel, and indeed for my original pass if we map the confidence of the predictions it was really certain about the glaciers being wetlands. This somewhat make sense, as the only labels we'd given our <a href="https://en.wikipedia.org/wiki/Statistical_classification">classifier</a> came from species on the <a href="https://iucnredlist.org">IUCN Redlist</a> and their habitat preferences, and there are wetland species on Iceland, and I guess from space ice, aka solid water, is going to look a bit like it's more liquid sibling.</p>
+<p>To solve this within our current method we need two things that we don't have:</p>
+<ol>
+<li>We need occurrences on glaciers, as my habitat map generation is ultimately driven by species occurrence data</li>
+<li>We need there to be a glacier category in the IUCN Habitats Classification Scheme (Version 3.1)</li>
+</ol>
+<p>And so that's exactly what I made happen. The second one is easy enough: I have just added a new top level class to the scheme for my code, class 19, with the first, and I strongly suspect not the last, entry being &quot;19.1: Glaciers&quot;. My habitat map can now have glacier pixels because they exist in my version of the scheme, and they will be happily ignored by the AOH process as no species is coded against them. This gives me the same properties as the Lumbierres et al habitat map, without needing to leave a gap. I could even publish it with those pixels removed, though I like to know what's there so in my own pipeline I'll hold on to them.</p>
+<p>But what about the occurrence data? Currently we take species occurrence data from <a href="https://www.gbif.org">GBIF</a> and <a href="https://ebird.org/home">eBird</a>, and no species there will have this new habitat as one its preferences. We could take some polygon data source and create synthetic occurrences within the glacier, but I'd rather not do that, as I feel there's some nice truth to the fact that outside all of the statistical magic in the Tessera foundation model all our inputs come back to human measurements (the occurrences from citizen science data, the filtering using [Open Street Map data][osm], etc.). Instead I realised we hear all the time about people going out and taking glacier core samples and doing depth measurements, and so there must somewhere be an effective dataset of glacier occurrences I could use and treat as if glaciers were <a href="https://tolweb.org/Terrestrial_Vertebrates">terrestrial vertebrates</a> - and this is a reminder that whilst I occasionally look like an ecologist and I'm in fact a computer scientist and will happily make unsafe <a href="https://en.wikipedia.org/wiki/Type_conversion">typecasts</a> between incompatible forms of existence.</p>
+<p>What surprised me about this approach was not that it worked, but how well Tessera did with just a few seed points. After looking around different glacial datasets I settled on the <a href="https://wgms.ch/data_databaseversions/">Fluctuations of Glaciers (FoG) database</a>, being a combination of human driven data, samples taken at precise locations, and having a suitable licensing terms for including in the project. Although there is a lot of data in FoG, a lot of this is because a) it's a global dataset and b) it notes the change in dept at a location year over year, and for Iceland it turned out there were just 20 sample sites within <a href="https://en.wikipedia.org/wiki/Hofsj%C3%B6kull">Hofsjökull</a>, one of the smaller glaciers in the middle of the country. But with just 20 pixels out of the 1,253,836,149 that make up Iceland we correctly identified most the glaciers within Iceland, the solid pale blue areas, with high confidence:</p>
+<div><div><img src="images-cached/4d8dba3d34424f7e.png" alt="Habitat"><img src="images-cached/c0f38ae1d421d2ed.png" alt="Entropy"><div></div><span>Habitat</span><span>Entropy</span></div></div>
+<p>The second view here is the <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">measure of entropy</a>, where darker colours are higher confidence. What's also good about this map is that it didn't seem to pick up any lakes or other water features as glaciers, which would have been a possible error.</p>
+<hr>
+<p>The takeaway from this is less &quot;oooh, we've solved glaciers&quot;, but I think it shows an important extensions from beyond the Lumbierres et al method that inspired my work.</p>
+<p>When I started on the &quot;Lumbierres et al by with Tessera&quot; project I'd not realised that by mapping occurrences to land cover classes within the Copernicus land cover map, that team inherited all the work to go from source satellite data to a classified land cover map that the Copernicus team did. Tessera starts from similar raw inputs, but the point of the foundation model is to learn the patterns in the source data without committing them like the Copernicus map does. So this work needs to somehow fill in that training gap, which means I need to get data sources beyond just species data.</p>
+<p>The glaciers just throw this into sharp relief, but I already knew this in a more messy way. The maps of Madagascar or Minas Gerais I've been producing clearly show problems that come from a lack of occurrence data, and although my maps validate somewhat highly, this is more due to the lack of diversity in the occurrence data in these data-deficient areas than it is that the broader map is good: I score higher than Lumbierres et al but a look at the map tells a different story. I now understand this is because of that gap between the original satellite data and the land cover map rather than I'm doing a worse job with the occurrence data than the Lumbierres et al team. The challenge is whether I can supplement the input occurrence data with outer sources of truth without compromising on the occurrence data being the key driver of habitats: the point is to build a map that reflects what the IUCN Redlist assessors see, not what is actually on the ground by some other measurement method.</p>
+<hr>
+<p>That's not to say in Iceland my work is done: I found a new nemesis in the form of <a href="https://www.iucnredlist.org/species/22679856/281843607"><em>Cygnus cygnus</em>, aka the Whooper Swan</a> (it takes over top nemesis position from <a href="https://digitalflapjack.com/weeknotes/2026-10-12/">the woodpigeon</a>). It turns out that <a href="https://www.icelandreview.com/ask-ir/why-there-are-so-many-swans-in-iceland/">Iceland has a lot of swans</a>, so much so that an icelandic person I was asking for local insight from said you'll see a field that you think is full of sheep from afar and realise it's full of swans when you get close.</p>
+<p>Why are swans a problem? Well, if we look at the IUCN Redlist data for the Whooper Swan we see it's habitat preferences listed as:</p>
+<ul>
+<li>5.5 Permanent Freshwater Lakes (over 8ha) for both breeding and non-breeding season</li>
+<li>14.1 Arable land for the non-breeding season</li>
+</ul>
+<p>And the range is given as:</p>
+<p></p><div><div><div>
+<img src="images-cached/9b5eebf1c37230cf.png" alt="A map of iceland that is mostly covered by a green area, with a few small pink areas"></div></div></div><p></p>
+<p>Pink is resident (both breeding and non-breeding), and the green is the breeding season (most of the non-breeding range is outside Iceland). So from this we can see that for the Swan most of Iceland is only fair game in the breeding season, and in the breeding season the only valid habitat is in permanent freshwater lakes over 8 hectares in size, and so we should see Swan occurrences in a very limited set of places in Iceland...</p>
+<p></p><div><div><div>
+<img src="images-cached/63a187493d70c373.png" alt="A map of iceland that is mostly covered by a green area, with a few small pink areas, and then a series of dots that are liberally spread around the map, sometimes following obvious water trends like rivers and lakes, but also quite broadly spread otherwise."></div></div></div><p></p>
+<p>Basically we see swans occurring over a wide range of Iceland where the IUCN Redlist data implies they shouldn't: the swans didn't get the memo. If we zoom in on the area around <a href="https://en.wikipedia.org/wiki/Lagarflj%C3%B3t">Lögurinn</a> we can see that the river (dark blue) has been correctly classified, but the land around it is being marked as lakes (light blue):</p>
+<div><div><img src="images-cached/d2545dc324cd85ad.png" alt="Habitat"><img src="images-cached/5a453705783e1825.png" alt="Satellite"><div></div><span>Habitat</span><span>Satellite</span></div></div>
+<p>This is a nice caricature of a generally broader problem with species that can move, in that they will turn up where you don't expect them, but you hope statistically you can remove outliers. But in this case we have what looks to me (remember, a computer scientist, and only a pretend ecologist), like a case of limited assessment accuracy, with swans in the breeding season clearly occasionally venturing onto dry land. Until <a href="https://ecoevorxiv.org/repository/view/15908/">Shane sorts this out at source</a>, I need to find another way to deal with data like this.</p>
+<p>The obvious answer is to filter the occurrences based on lakes using Open Street Map data as I do for other areas, but I already know that OSM coverage is patchy in the same problem areas where occurrence data is patchy. To verify this assumption I compared OSM lake coverage with <a href="https://www.hydrosheds.org/products/hydrolakes">the HydroLAKES dataset</a>, which is a global dataset of bodies of water over 10 hectares in size (which means it also gets artificial reservoirs). In comparison we can see:</p>
+<div><table>
+<tbody><tr>
+<th>Region</th>
+<th>Lakes</th>
+<th>In OSM</th>
+<th>Missing (under 10% covered)</th>
+</tr>
+<tr>
+<td>UK</td>
+<td>2,189</td>
+<td>95.9%</td>
+<td>3.0%</td>
+</tr>
+<tr>
+<td>Iceland</td>
+<td>1,596</td>
+<td>90.1%</td>
+<td>7.0%</td>
+</tr>
+<tr>
+<td>Minas Gerais</td>
+<td>745</td>
+<td>63.9%</td>
+<td>34.5%</td>
+</tr>
+<tr>
+<td>Madagascar</td>
+<td>1,513</td>
+<td>32.2%</td>
+<td>63.4%</td>
+</tr>
+</tbody></table></div><p>This actually makes a nice quantification of one of the challenges with OSM: it's really good in densely populated/affluent parts of the world, but in the places where we need it the most the coverage is quite poor at times.</p>
+<p>So, despite my trying to limit the inputs to my habitat mapping outside of Tessera to those with human links, I think I need to accept some amount of other modelled inputs to try gain confidence otherwhere, so for now I've added HydroLAKES alongside OSM to filter occurrences for Whooper Swans in their breeding range to be only inside lakes.</p>
+<p>Despite this we still get a lot of lake cover where we shouldn't in Iceland, and so there's another driver there I need to figure out. More on this next week!</p>
+<h1>LIFE pipeline maintenance</h1>
+<p>We have some new starters on the LIFE project, and to head of some of the questions I was getting asked, I realised I needed to do a better job at documenting some of the code, rather than relying on the old-guard having already some context. The <a href="https://github.com/quantifyearth/aoh-calculator">Python AOH calculator package</a> does have quite a bit of documentation hidden in the code, so I took the time to take the old README and the code comments and make <a href="https://aoh.readthedocs.io/en/latest/">a proper set of documentation</a> for the package. Is it comprehensive yet? No. Is it more accessible than what was there before? Yes.</p>
+<p>I've never used readthedocs.io before, as <a href="https://yirgacheffe.org">Yirgacheffe</a> has its own website with the docs on, but I figured paying out of my own pocket for the domain for every Python package I make isn't that sustainable, and readthedocs.io is a very well trodden path in this domain, so hopefully helps with documentation discovery.</p>
+<hr>
+<p>Related, <a href="https://www.zoo.cam.ac.uk/people/emilio-luz-ricca">Emilio Luz-Rucca</a>, one of the more established PhD students on the project, filed a fantastic bug report on Yirgacheffe. He found an issue, and dug into it in enough detail that he sent me a stand alone reproduction with Python code and data to exercise the bug. It's rare I get that level of detail from a computer scientist let alone a zoologist, so a huge  thanks to Emilio.</p>
+<p>In the end it turned out that I had two bits of logic I'd implemented in different parts of Yirgacheffe without considering how they'd interact - a classic problem with any project that gets sufficiently large. What Emilio had found was that if you had two GeoTIFF files with the band names the same then you'd get the wrong answer. This is because the internal expression optimisation code is keyed in part on the layer name, which is usually the file name, but to help with debugging at some point I'd changed the logic to use the band name within the GoeTIFF as the layer name, so these two distinct files with the same internal band names looked identical 🤦 A rookie mistake, but easily fixed, particularly as I had a strong hunch from the moment I saw Emilio's reproduction code.</p>
+<p>One never likes to have bugs in their code, but it will always happen, and so then the next best thing is to make finding and understanding them as easy as possible. This is where having lots of unit tests helps even though they didn't catch the bug: they told me where it couldn't be, so that also helped narrow down what could be going on.</p>
+<h1>POP4</h1>
+<p>I went to <a href="https://futureyard.org/listings/pop4-climate-conference/">POP4: A climate conference for arts, culture and music</a>, a day long conference looking at the intersection of the climate emergency and the local cultural sector. I have to confess, when I signed, I'd not realised how closely focussed on the cultural sector it would be - it turns out I wasn't alone in that misunderstanding - but it was still interesting to learn both about a different set of concerns, and just have my expectations reset a little. Despite the all white male panel in the opening session shown in the photo, the other sessions did thankfully have a more diverse set of hosts, including a strong contingent from the local city and regional authorities, and from national arts organisations.</p>
+<p></p><div><div><div>
+<img src="images-cached/8dd505e758170af2.jpg" alt="four white men on a panel at a conference in front of a screen saying POP4"></div></div></div><p></p>
+<p>My main takeaways were:</p>
+<ul>
+<li>A reminder that to mot people climate is carbon and energy. I've got so used to sitting in the bubble of biodiversity impacts, and I've been bought in to the energy transition for a long time (solar on house, electric vehicles, etc.) that I kinda of forget that this is still a fight we have. Like, I know it's not won, but I guess I take the whole thing as read, and so it was good for me to sit in a session where people are struggling to do the right thing on energy and looking at ways to win that battle to have a sort of complacency check on my behalf.</li>
+<li>There was a representative from <a href="https://www.ecotricity.co.uk/for-your-business">Ecotricity Buisness</a> there, and event organisers, and I learned that there is a <a href="https://en.wikipedia.org/wiki/Secondary_market">secondary market</a> for grid connections now, which was quite depressing. Basically the tl;dr seems to be that the UK national grid infrastructure can only take so much additional load at a time, so there is a queue system for say wind-farms looking to connect to the grid who will have to wait potentially years before they can join. So what happens is companies will just grab the slots and sit on them and then sell that slot to a wind-farm as it comes online. It seemed there was a different but similar process for festivals trying to get grid access. The efficiency of capitalism is always somewhat in the places we need it least it seems (to me).</li>
+<li>The majority energy costs for many cultural events is not in the event itself, but in the transport to and from the event, based on data from the hosts <a href="https://futureyard.org">Future Yard</a> and Liverpool council. There's an obvious challenge with many events that finish after public transport shuts down.
+<div><div><div>
+<img src="images-cached/a4eea5668904adf4.jpg"></div></div></div></li>
+<li>There are a lot of enthusiastic and concerned people in the cultural space in the greater Liverpool area from a wide range of backgrounds. I chatted to event organisers, people who ran community spaces, and people who attend cultural events and were concerned about their impact. I had a couple of conversations with local educators and artists where we discussed how a science practitioner in this space might be able to relate collaborate on what they do.</li>
+</ul>
+<h1>Virtual bird watching</h1>
+<p>Seems people are <a href="https://www.vice.com/en/article/birdwatchers-are-apparently-buying-gta-6-just-to-watch-birds-heres-how-many-are-in-the-game/">buying GTA 6 to do bird watching</a>, which reminds me of this video I meant to post a while ago on bird watching in Red Dead Redemption 2:</p>
+<div><div><div></div></div></div>
+<p>Not only does Wren cover what birds RDR2 gets correct and wrong, but they also highlight how there's a lot of historical content around birds being farmed almost to extinction at the time if you look for it, which normally would pass you by.</p>
+<p>I have to confess, I have a love of video game maps, somewhat more than the actual main quest line itself, so I'm a big fan of what seems to have become the &quot;AnyAustinification&quot; of youtube, which is to say anthropology done semi-seriously in videogames, most notably by Any Austin:</p>
+<div><div><div></div></div></div>
+<p>Video games form an important liminal space in our cultural lives now, and so I think this sort of thing is really interesting. I spent a lot of time keeping up with friends and family in these virtual spaces, given that I live distant from many of both. Whilst there are <a href="https://www.youtube.com/watch?v=z0i-gtwCm98">more technical videos on the impressive construction details of the maps</a>, what I like about Any Austin's videos in particular is that he covers the more human implications of the design decisions in this spaces and how they use the detail they chose to apply or not apply to give a sense of something.</p>
+<p>I spend my day making maps by scientists, for scientists - and indeed one of the discussions I was having with artists and educators at POP4 was to try and find ways to take these maps and make them more accessible to a broader audience. For that they will need to say things in a different way or say different things than what a scientist expects, and these videos mostly remind me that that set of design decisions is harder than you'd think.</p>
+<p>The downside of GTA with all this is that whilst Rockstar reliably make the most detailed and immersive open worlds to set their games in, they are ultimately coupled to a style of video game I don't personally find appealing, and with increasing realism find harder to ignore that side of things. Perhaps my next job I can find a way to make a biodiversity rich open world game that isn't centred around death and violence of people, but perhaps the struggle to avoid that at a more global scale? I guess the challenge is Rockstar know what most people are willing to pay for, and it <a href="https://www.rollingstone.com/culture/culture-news/gta-vi-girlfriend-wife-nice-gamers-chuds-1235661480/">probably isn't a woke version</a>.</p>
+<h1>Was software just always too complex for humans?</h1>
+<p>That said, I assume there will be a job for me in the future, but having read <a href="https://anil.recoil.org/notes/software-too-complex-for-humans">Anil's latest blog post &quot;Was software just always too complex for humans?&quot;</a> that is less clear. I've not properly internalised it all, but I think it's an interesting provocation and test of <a href="https://en.wikipedia.org/wiki/Betteridge%27s_law_of_headlines">Betteridge's law</a>.</p>
+<p>As ever with a lot of these LLM/coding arguments I think the LLM is just an accelerant on an underlying problem. &quot;Software Engineering&quot; is one of the greatest lies ever told, and I say this as someone who has an undergraduate degree in Software Engineering rather than Computer Science (in which I have a doctorate). I know real engineers, I've seen accreditation and all the other things that goes with that. And I've seen &quot;software engineering&quot; - being a director of a software security product quickly tells you that what we're doing isn't engineering. There is no rigorous spec, there is no acceptance, and those of us that care make do with as much as we can lash together: unit testing, continuous integration, QA teams, etc.</p>
+<p>LLMs/coding agents just amplify this rather than are the source of the problem, and they obviously amplify the pitfalls of this via faster exploitation. We build software beyond the limits of our capabilities to understand/manage, and we have done so willingly in the seek of other forms of success beyond correctness. This pressure isn't unique to our industry, but in most other disciplines the cost of failure was more obviously likely to kill someone so they were regulated in a way we haven't been. If you want a vibe coder just find me someone who writes pages of C by hand and doesn't write any tests.</p>
+<p>I struggle with this in making data-science pipelines: if I get my code wrong at best I'll feel sheepish when someone points out a bug, but at worst someone will publish a paper that is wrong and perhaps that'll hurt their career, or governments will use our biodiversity analysis to make a globally impactful decision, however minor, and then we'll make the environment worse rather than better, just because <a href="https://static0.cbrimages.com/wordpress/wp-content/uploads/2024/09/oliver-wendell-jones-nearly-erases-opus-from-existence-when-he-can-t-explain-flightless-waterfowl-in-the-grand-unification-theory.JPG">I forgot to carry the two somewhere</a>. I then look at my habitat map work and compare it with some well-put-together AI-generated habitat maps last week, which came will detailed explanations of how they were put together and validation results, and wonder what I'm doing messing around trying to understand why I've urbanised the top of the Black Cullin mountain range... and that's despite having high validation scores on my map. So perhaps the missing part of going spec heavy as Anil suggests is we first need to do a better job of acceptance, not just specification.</p>
+<p>As I say, I've not properly thought through all of Anil's arguments, and I feel a need to push back against it somewhat, but I hope I've made it clear that I think it's an interesting thought exercise and one we as an industry do need to grapple with whether we like it or not given the CVE avalanche that is hitting us (and knowing CVEs are just one strand of failure, there are others that are happening too).</p></div>
+      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
+      
+    </article>
     
     <article class="post">
       <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
@@ -1085,47 +1213,6 @@ else as “your” decision.</p></li>
       </div>
       
       <div class="summary">A tool to explore the 132 public submissions to the EDPB draft guidelines on scientific research, and what they say about the definition of research, consent, and anonymisation.</div>
-      <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
-      
-    </article>
-    
-    <article class="post">
-      <div class="post-header"><a class="post-icon-link" href="https://digitalflapjack.com">
-        <div class="post-icon icon-placeholder"></div></a>
-        <div>
-          <h1 class="post-title"><a class="post-link" href="https://digitalflapjack.com/weeknotes/2026-09-14/">Weeknotes: 14th September 2026</a></h1>
-          <div class="post-meta">
-            <span class="feed-title"><a href="https://digitalflapjack.com">Michael Dales</a></span>
-            <span class="post-date">2026-09-14 10:00 UTC</span>
-          </div>
-          <p class="content-note">Some embedded content from this post is not shown here (input) - consider seeing the original post.</p>
-        </div>
-      </div>
-      
-      <div class="summary"><h1>Last week</h1>
-<h2>Liverpool Makefest 2026</h2>
-<p><a href="https://liverpoolmakefest.org">Liverpool Makefest 2026</a> happened on Sunday and seemed to go well. This year rather than being an exhibitor I was on the organising team, as the event was effectively rebooted. After many hiccups along the way, it all seemed to come together in the end with 30 makers setting up stall and a few hundred people coming to see them. It was touch and go at times, but it looks like we pulled it off. It was definitely a team effort: so particular thanks to Jackie, Neil, Dan, and Mike, along with all the volunteers from the <a href="https://doesliverpool.org/">DoES Liverpool community</a> who ensured it went smoothly on the day, and the makers, some of which travelled quite a long way, who came and made the day so full of interesting things to see, hear, and touch.</p>
-<h2>Habitat mapping</h2>
-<p>The main focus last week was migrating from version 1.1 of <a href="https://geotessera.org">Tessera</a> to the beta version 2 embeddings. In addition to the data layer changes, this also required a reworking of my inference code as <a href="https://github.com/ucam-eo/geotessera">the geotessera Python package's</a> API changed quite significantly (at least, based on how I was using it) as I migrated from the numpy storage system in v0.9 to the <a href="https://geozarr.org">zarr</a> based backend. The perils of innovating on multiple fronts!</p>
-<p>In the UK this seemed to not have a huge impact on my results, which is to be expected as I was relatively data rich in the UK: it would be interesting to see how I can scale back my data usage in the UK and still have good results perhaps, or as <a href="https://anil.recoil.org">Anil Madhavapeddy</a> suggested to use the lower resolution version of Tessera v2. Basically for Europe we can probably generate quite good habitat maps using much less compute and/or data than I'm currently doing.</p>
-<p>However, the flip side to that is that my very first run on Madagascar was mostly rubbish, due to a combined lack of occurrence data and <a href="https://openstreetmap.org">Open Street Map</a> data in that country. In the UK I found I got a reasonable map with just 50K occurrences going in, but Madagascar is over twice the size of the UK and has a much more varied set of habitats, and I only have around 5K occurrences, and those are very much clustered in popular points (mostly urban areas and forests), leaving a lot of the country under represented, and this clearly wrong in the final map. In small areas though it does a nice job, such as spotting these irrigation channels amongst the fields around <a href="https://en.wikipedia.org/wiki/Andapa">Andapa</a>.</p>
-<div><div><img src="images-cached/b6369bddf8a56c34.png" alt="habitat map"><img src="images-cached/0699c2dbf7a0f380.png" alt="satellite view"><div></div><span>habitat map</span><span>satellite view</span></div></div>
-<p>At the top level this is quite good, with the dark purple being arable and the light purple being urban. The greens are mostly subtropical moist forest with a smattering of subtropical montane forest, and then the blue is mostly wetlands, though technically this should be artificial drainage - though water is awkward in these maps without other data. But overall the matching is one of the few reasonably good bits we resolved, but that is one small bright star in an otherwise dark sky of incorrectness (yes, yes, I'm not a writer :).</p>
-<p>As with Brazil I'll review the data to see if there's any obvious pipeline deficiencies, particularly with respect to regional variances in how OSM data is structured (<a href="https://digitalflapjack.com/weeknotes/2026-08-31/">I wrote about this before for Brazil</a>), but ultimately I do think we just are data deficient for my approach in that region. In theory, that shouldn't matter, as Tessera is a global model, and pixels are comparable around the world, so if I have similar habitats in other countries that are more rich in occurrence data (perhaps in the southern parts of Africa, Indonesia, etc.) then that will work just as well. The challenge there is that the v2 embeddings for Tessera are not yet global, and so I'll need to see what I can do there. I still have confidence in the method I'm using, it's just how soon can I get the data to try and de-risk its applicability in areas like this.</p>
-<p>In the mean time if this is going to be blocked on more Tessera v2 coverage, then I might spend a bit of time shoring up my ideas around using Tessera to help suggest OSM edits.</p>
-<h2>LIFE</h2>
-<p>I was asked to make a custom LIFE layer for the LIFE team, which I failed to hit the deadline for. Thankfully it wasn't for a major part of the paper, and so it'll probably be worked into the review phase - it's just an attempt to make a more accurate version of an estimate they already have some data for. Still, never fun to send people the &quot;you're not going to get this in time&quot; email. The main reason it failed was that having not run the LIFE data for half year, I hit the usual environment atrophy that plagues modern software engineering. My GDAL had updated since I last ran it, <a href="https://yirgacheffe.org">Yirgacheffe</a> had changed and I wanted to update that, and some of the code in LIFE itself for this run was also out of date (the scenario in question not being one we run regularly). In theory an hour or two's work, but then I need to double check everything before doing the large aggregated run and it all adds up.</p>
-<p>In theory I'd dockerise it all, and so the code could be frozen in time, but I use MLX to run this on my Apple Silicon using its GPUs, and that doesn't work with Docker. The main learning probably is that whilst I can do that for development, I should probably dockerise it and check it runs on our large Linux machines before I park a project.</p>
-<h1>This week</h1>
-<p>This is a short week as I'm on PTO for the back half of the week. Priorities are:</p>
-<ul>
-<li>Fix some of the smaller outstanding issues on my Tessera switch - I have some UTM tearing I need to fix in the final rasters</li>
-<li>Get this LIFE layer done so I don't need to repeat this panic when the paper reviews come back in</li>
-</ul>
-<h1>Interesting links</h1>
-<ul>
-<li>I missed the previous <a href="https://2025.algorithmicpattern.org/conference/">Alpaca Conference</a>, a celebration of generative art held in Sheffield in 2025, but <a href="https://alpaca.cc/call/">the CFP the next one in May 2027</a> has gone live. I think I'll submit a workshop on generative art in a functional programming style using Claudius/OCaml. By then the HTML version will hopefully be usable so people can actually make things they can share.</li>
-</ul></div>
       <button type="button" class="expand-toggle" aria-expanded="false">Expand &#9662;</button>
       
     </article>
